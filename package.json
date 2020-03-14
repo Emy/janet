@@ -1,0 +1,14 @@
+{
+  "name": "rjbBot",
+  "version": "1.0.0",
+  "description": "A bot for the r/jb discord",
+  "main": "index.js",
+  "repository": "https://github.com/Emy/rjbBot",
+  "author": "Emy",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "discord.js": "discordjs/discord.js",
+    "dotenv": "^8.2.0",
+    "klasa": "dirigeants/klasa"
+  }
+}
