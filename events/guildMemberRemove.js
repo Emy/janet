@@ -11,13 +11,13 @@ module.exports = class extends Event {
   }
 
   async run(member) {
-    if (!member.guild.settings.get('logChannel')) return;
+    if (!member.guild.settings.get('privateLogChannel')) return;
     const embed = new MessageEmbed()
     .setTitle('Member Left')
-    .setThumbnail(member.user.avatarURL({type: 'jpg'}))
+    .setThumbnail(member.user.avatarURL({format: 'jpg'}))
     .setColor('RED')
     .addField('User', member.user.tag)
-    this.client.channels.cache.get(member.guild.settings.get('logChannel')).send(embed);
+    this.client.channels.cache.get(member.guild.settings.get('privateLogChannel')).send(embed);
   }
 
   async init() {}

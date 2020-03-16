@@ -1,5 +1,6 @@
 const { Command } = require('klasa');
 const { MessageEmbed } = require('discord.js');
+const Case = require('../../util/case');
 
 module.exports = class extends Command {
 
@@ -23,17 +24,30 @@ module.exports = class extends Command {
     if (!bannedPlayers.has(user.id)) return;
     await msg.guild.members.unban(user, reason);
 
-    const logChId = msg.guild.settings.get('logChannel');
-    if (!logChId) return 'logchannel';
-    const embed = new MessageEmbed()
-      .setTitle('Member Unbanned')
-      .setThumbnail(user.avatarURL({ type: 'jpg' }))
-      .setColor('GREEN')
-      .addField('Member', user.tag, true)
-      .addField('Mod', msg.author.tag, true)
-      .addField('Reason', reason);
-      this.client.channels.cache.get(logChId).send(embed);
+    const c = await Case(this.client, msg, user, {
+      type: 'UNBAN',
+      reason: reason,
+      duration: null,
+      warnPointsAdded: 0
+    });
+
+    this.sendEmbed(msg, user, reason, c);
   }
 
   async init() {}
+
+  sendEmbed(msg, user, reason, c) {
+    const logChId = msg.guild.settings.get('publicLogChannel');
+    if (!logChId) return 'logchannel';
+    const embed = new MessageEmbed()
+      .setTitle('Member Unbanned')
+      .setThumbnail(user.avatarURL({ format: 'jpg' }))
+      .setColor('GREEN')
+      .addField('Member', user.tag, true)
+      .addField('Mod', msg.author.tag, true)
+      .addField('Reason', reason ? reason : 'No reason.')
+      .setFooter(`Case #${c.id} | ${user.id}`)
+      .setTimestamp();
+      this.client.channels.cache.get(logChId).send(embed);
+  }
 };

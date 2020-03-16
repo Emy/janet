@@ -1,5 +1,5 @@
 {
-  "name": "rjbBot",
+  "name": "janet",
   "version": "1.0.0",
   "description": "A bot for the r/jb discord",
   "main": "index.js",
@@ -9,6 +9,7 @@
   "dependencies": {
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
-    "klasa": "dirigeants/klasa"
+    "klasa": "dirigeants/klasa",
+    "shoukaku": "Deivu/Shoukaku"
   }
 }

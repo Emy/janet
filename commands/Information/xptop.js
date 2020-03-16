@@ -9,21 +9,24 @@ module.exports = class extends Command {
       runIn: ['text'],
       requiredPermissions: [],
       requiredSettings: [],
-      guarded: false,
+      aliases: [],
       description: '',
       extendedHelp: 'No extended help available.',
-      usage: '[user:user]',
     });
   }
 
-  async run(msg, [user]) {
-    if (!user) user = msg.author
+  async run(msg, [...params]) {
+    const leaderboard = this.client.users.cache.sort((a,b) => {
+      if (a.settings.xp > b.settings.xp) return -1;
+      if (a.settings.xp < b.settings.xp) return 1;
+      return 0;
+    }).array().slice(0, 10);
+    let counter = 1;
     const embed = new MessageEmbed()
-      .setTitle('Warn Points')
-      .setColor('ORANGE')
-      .setThumbnail(user.avatarURL({ format: 'jpg' }))
-      .addField('Member', user.tag)
-      .addField('Warn Points', user.settings.get('warnPoints'));
+      .setTitle('Leaderboard');
+    leaderboard.forEach((user) => {
+      embed.addField(`#${counter++} - Level ${user.settings.level}`, `<@${user.id}>`)
+    });
     msg.send(embed);
   }
 

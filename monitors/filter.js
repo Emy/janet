@@ -14,12 +14,20 @@ module.exports = class extends Monitor {
   }
 
   async run(msg) {
-    const offensiveWords = msg.guild.settings.get('filterWords');
-    const excludedChannels = msg.guild.settings.get('filterExcludedChannels');
-    // if (excludedChannels && excludedChannels.some((excludedChannel) => msg.channel.id == excludedChannel)) return '';
-    if (offensiveWords.some((offensiveWord) => msg.content.toLowerCase().indexOf(offensiveWord.toLowerCase()) > -1)) {
-      msg.send('real nigga hours')
-    }
+    const filteredWords = [];
+    let highestPrio = -1;
+    msg.guild.settings.filterWords.forEach((filterWord) => {
+      if (!(msg.content.toLowerCase().indexOf(filterWord.word.toLowerCase()) > -1)) return;
+      filteredWords.push(filterWord.word);
+      if (!(highestPrio < filteredWord.priority)) return;
+      highestPrio = filteredWord.priority;
+    });
+    if (filteredWords.length === 0) return;
+    const excludedChannels = msg.guild.settings.get('excludedChannels');
+    if (excludedChannels.some((excludedChannel) => msg.channel.id == excludedChannel)) return;
+    
+    console.log(filteredWords);
+    console.log(highestPrio);
   }
 
   async init() {}

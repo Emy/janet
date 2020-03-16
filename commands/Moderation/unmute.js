@@ -8,8 +8,9 @@ module.exports = class extends Command {
     super(...args, {
       enabled: true,
       runIn: ['text'],
-      requiredPermissions: ['KICK_MEMBERS'],
-      guarded: true,
+      requiredPermissions: [],
+      requiredSettings: [],
+      guarded: false,
       permissionLevel: 0,
       description: '',
       extendedHelp: 'No extended help available.',
@@ -19,34 +20,30 @@ module.exports = class extends Command {
   }
 
   async run(msg, [member, reason]) {
-    if (member.id === this.client.user.id) return 'bot not kickable';
-    if (member.id === msg.author.id) return 'cant kick yourself';
-    if (member.roles.highest.position >= msg.member.roles.highest.position) return 'role height';
-    if (!member.kickable) return 'not kickable';
-    await member.kick(reason);
+    if (!member.roles.cache.has(msg.guild.settings.roles.muted)) return;
+    await member.roles.remove(msg.guild.settings.roles.muted);
     const c = await Case(this.client, msg, member.user, {
-      type: 'KICK',
+      type: 'UNMUTE',
       reason: reason,
       duration: null,
-      warnPointsAdded: warnPointDiff
+      warnPointsAdded: 0
     });
-    this.sendEmbed(msg, member, reason, c);
   }
 
   async init() {}
 
-  sendEmbed(msg, member, reason, c) {
-    const logChId = msg.guild.settings.get('publicLogChannel');
-    if (!logChId) return 'logchannel';
+  sendEmbed() {
+    const logChId = msg.guild.settings.publicLogChannel;
+    if (!logChId) return;
     const embed = new MessageEmbed()
-      .setTitle('Member Kicked')
+      .setTitle('Member Unmuted')
       .setThumbnail(member.user.avatarURL({format: 'jpg'}))
-      .setColor('RED')
-      .addField('Member', `${member.user.tag} (<@${member.id}>)`, true)
-      .addField('Mod', msg.author.tag, true)
+      .setColor('GREEN')
+      .addField('Member', `${member.user.tag} (<@${member.id}>)`)
+      .addField('Mod', msg.author.tag)
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
-    this.client.channels.cache.get(logChId).send(embed);
+    return this.client.channels.cache.get(logChId).send(embed);
   }
 };

@@ -10,18 +10,19 @@ module.exports = class extends Event {
   }
 
   async run(msg) {
-    if (oldMsg.author.bot) return;
-    logChId = msg.guild.settings.get('logChannel')
+    if (msg.author.bot) return;
+    const logChId = msg.guild.settings.get('privateLogChannel')
     if (!logChId) return;
     if (!msg.content) return;
     if (msg.channel.id === logChId) return;
     const embed = new MessageEmbed()
     .setTitle('Message Deleted')
-    .setThumbnail(msg.author.avatarURL({type: 'jpg'}))
+    .setThumbnail(msg.author.avatarURL({format: 'jpg'}))
     .setColor('RED')
     .addField('User', msg.author.tag, true)
     .addField('Channel', `<#${msg.channel.id}>`, true)
-    .addField('Message', msg.content);
+    .addField('Message', msg.content)
+    .setTimestamp();
     
     this.client.channels.cache.get(logChId).send(embed);
   }
