@@ -4,6 +4,7 @@ const { Util } = require('discord.js');
 module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
+      enabled: false,
       runIn: ['text'],
       requiredPermissions: ['EMBED_LINKS'],
       aliases: ['np'],

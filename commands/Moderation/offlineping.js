@@ -1,5 +1,4 @@
 const { Command } = require('klasa');
-const FilteredWord = require('../../util/filteredWord')
 
 module.exports = class extends Command {
 
@@ -21,21 +20,18 @@ module.exports = class extends Command {
       permissionLevel: 5,
       description: '',
       extendedHelp: 'No extended help available.',
-      usage: '<priority:integer> <word:...string>',
-      usageDelim: ' ',
+      usage: '<bool:boolean>',
+      usageDelim: undefined,
       quotedStringSupport: false,
       subcommands: false
     });
   }
 
-  async run(msg, [priority, word]) {
-    const fw = new FilteredWord({
-      word: word,
-      priority: priority
-    });
-    await msg.guild.settings.update('filter.words', fw, { action: 'add' });
-    msg.send(`Added ${word} with priority ${priority}.`);
+  async run(msg, [bool]) {
+    msg.author.settings.update('offlineReportPing', bool);
+    msg.send(`Offline ping set to: ${bool}`);
   }
 
   async init() {}
+
 };

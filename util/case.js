@@ -3,6 +3,7 @@ class Case {
     this.id = options.id;
     this.type = options.type;
     this.date = options.date;
+    this.until = options.until;
     this.modID = options.modID;
     this.modTag = options.modTag;
     this.reason = options.reason;
@@ -12,20 +13,4 @@ class Case {
   }
 }
 
-module.exports = 
-  async (client, msg, user, options) => {
-    const c = new Case({
-      id: client.settings.caseID,
-      type: options.type,
-      date: Date.now(),
-      modID: options.modID ? options.modID : msg.author.id,
-      modTag: options.modTag ? options.modTag : msg.author.tag,
-      reason: options.reason,
-      duration: options.duration,
-      warnPointsAdded: options.warnPointsAdded,
-      currentWarnPoints: user.settings.warnPoints
-    });
-    await client.settings.update('caseID', client.settings.caseID + 1)
-    await user.settings.update('cases', c, { action: 'add' })
-    return c;
-  };
+module.exports = Case;

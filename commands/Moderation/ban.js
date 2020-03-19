@@ -10,7 +10,7 @@ module.exports = class extends Command {
       runIn: ['text'],
       requiredPermissions: ['BAN_MEMBERS'],
       guarded: true,
-      permissionLevel: 0,
+      permissionLevel: 5,
       description: '',
       extendedHelp: 'No extended help available.',
       usage: '<member:member> [reason:...string]',
@@ -24,20 +24,33 @@ module.exports = class extends Command {
     if (member.roles.highest.position >= msg.member.roles.highest.position) return msg.send('Your highest role is even or lower than the target users role.');
     if (!member.bannable) return msg.send('The target is not bannable.');
     await member.ban({days: 1, reason: reason ? reason : 'No reason.'});
-    const c = await Case(this.client, msg, member.user, {
-      type: 'BAN',
-      reason: reason,
-      duration: null,
-      warnPointsAdded: 0
-    });
+    const c = await this.buildCase(msg, reason, member.user);
     this.sendEmbed(msg, member, reason, c);
   }
 
   async init() {}
 
+  async buildCase(msg, reason, user) {
+    const c = new Case({
+      id: this.client.settings.caseID,
+      type: 'BAN',
+      date: Date.now(),
+      until: undefined,
+      modID: msg.author.id,
+      modTag: msg.author.tag,
+      reason: reason,
+      duration: 'PERMANENT',
+      warnPointsAdded: 0,
+      currentWarnPoints: user.settings.warnPoints
+    });
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await user.settings.update('cases', c, { action: 'add' });
+    return c;
+  }
+
   sendEmbed(msg, member, reason, c) {
-    const logChId = msg.guild.settings.get('publicLogChannel');
-    if (!logChId) return;
+    const channelID = msg.guild.settings.channels.public;
+    if (!channelID) return;
     const embed = new MessageEmbed()
       .setTitle('Member Banned')
       .setThumbnail(member.user.avatarURL({format: 'jpg'}))
@@ -47,6 +60,6 @@ module.exports = class extends Command {
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
-    this.client.channels.cache.get(logChId).send(embed);
+    this.client.channels.cache.get(channelID).send(embed);
   }
 };

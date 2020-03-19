@@ -1,5 +1,6 @@
 const { Task } = require('klasa');
 const { MessageEmbed } = require('discord.js');
+const Case = require('../util/case');
 
 module.exports = class extends Task {
 
@@ -13,8 +14,24 @@ module.exports = class extends Task {
     const member = guild.members.cache.get(data.memberID);
     if (!member) return;
 
-    if (!member.roles.cache.has(guild.settings.roles.muted)) return;
     await member.roles.remove(guild.settings.roles.muted);
+    if (!member.roles.cache.has(guild.settings.roles.muted)) return;
+    await member.user.settings.update('isMuted', false);
+
+    const c = new Case({
+      id: this.client.settings.caseID,
+      type: 'UNMUTE',
+      date: Date.now(),
+      until: undefined,
+      modID: this.client.user.id,
+      modTag: this.client.user.tag,
+      reason: 'Temporary mute expired!',
+      duration: undefined,
+      warnPointsAdded: 0,
+      currentWarnPoints: member.user.settings.warnPoints
+    });
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await member.user.settings.update('cases', c, { action: 'add' });
 
     const logChId = guild.settings.get('publicLogChannel');
     if (!logChId) return;
@@ -25,6 +42,7 @@ module.exports = class extends Task {
       .addField('Member', `${member.user.tag} (<@${member.id}>)`)
       .addField('Mod', this.client.user.tag)
       .addField('Reason', 'Temporary mute expired!')
+      .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
     return this.client.channels.cache.get(logChId).send(embed);
   }

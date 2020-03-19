@@ -11,10 +11,10 @@ module.exports = class extends Event {
 
   async run(msg) {
     if (msg.author.bot) return;
-    const logChId = msg.guild.settings.get('privateLogChannel')
-    if (!logChId) return;
+    const channelID = msg.guild.settings.channels.private;
+    if (!channelID) return;
     if (!msg.content) return;
-    if (msg.channel.id === logChId) return;
+    if (msg.channel.id === channelID) return;
     const embed = new MessageEmbed()
     .setTitle('Message Deleted')
     .setThumbnail(msg.author.avatarURL({format: 'jpg'}))
@@ -22,9 +22,10 @@ module.exports = class extends Event {
     .addField('User', msg.author.tag, true)
     .addField('Channel', `<#${msg.channel.id}>`, true)
     .addField('Message', msg.content)
+    .setFooter(msg.member.user.id)
     .setTimestamp();
     
-    this.client.channels.cache.get(logChId).send(embed);
+    this.client.channels.cache.get(channelID).send(embed);
   }
 
   async init() {}

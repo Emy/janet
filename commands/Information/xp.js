@@ -7,7 +7,7 @@ module.exports = class extends Command {
     super(...args, {
       enabled: true,
       runIn: ['text'],
-      requiredPermissions: [],
+      requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
       requiredSettings: [],
       aliases: ['xpstats'],
       guarded: false,
@@ -19,6 +19,12 @@ module.exports = class extends Command {
   }
 
   async run(msg, [user]) {
+    if (!await msg.hasAtLeastPermissionLevel(5)) {
+      if (!msg.guild.settings.channels.botspam) return;
+      if(msg.channel.id != msg.guild.settings.channels.botspam) {
+        return msg.send(`Command only allowed in <#${msg.guild.settings.channels.botspam}>`);
+      }
+    }
     if (!user) user = msg.author;
 
     const leaderboard = this.client.users.cache.sort((a,b) => {
@@ -35,10 +41,11 @@ module.exports = class extends Command {
 
     const embed = new MessageEmbed()
       .setTitle('Level Statistics')
+      .setColor('GREEN')
       .setThumbnail(user.avatarURL({ format: 'jpg' }))
       .addField('Member', user.tag)
       .addField('Level', user.settings.get('level'), true)
-      .addField('Experience Points', user.settings.get('xp'), true)
+      .addField('XP', user.settings.get('xp'), true)
       .addField('Rank', `${rank} / ${leaderboard.length}`, true);
     msg.send(embed);
   }

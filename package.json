@@ -10,6 +10,7 @@
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
     "klasa": "dirigeants/klasa",
+    "moment": "^2.24.0",
     "shoukaku": "Deivu/Shoukaku"
   }
 }

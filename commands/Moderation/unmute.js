@@ -11,7 +11,7 @@ module.exports = class extends Command {
       requiredPermissions: [],
       requiredSettings: [],
       guarded: false,
-      permissionLevel: 0,
+      permissionLevel: 5,
       description: '',
       extendedHelp: 'No extended help available.',
       usage: '<member:member> [reason:...string]',
@@ -20,21 +20,37 @@ module.exports = class extends Command {
   }
 
   async run(msg, [member, reason]) {
-    if (!member.roles.cache.has(msg.guild.settings.roles.muted)) return;
+    if (!member.roles.cache.has(msg.guild.settings.roles.muted)) return msg.send('Target is not muted.');
+    if (!member.user.settings.isMuted) msg.send('Target not muted.')
     await member.roles.remove(msg.guild.settings.roles.muted);
-    const c = await Case(this.client, msg, member.user, {
-      type: 'UNMUTE',
-      reason: reason,
-      duration: null,
-      warnPointsAdded: 0
-    });
+    await member.user.settings.update('isMuted', false);
+    const c = await this.buildCase(msg, reason, member.user);
+    this.sendEmbed(msg, member, reason, c);
   }
 
   async init() {}
 
-  sendEmbed() {
-    const logChId = msg.guild.settings.publicLogChannel;
-    if (!logChId) return;
+  async buildCase(msg, reason, user) {
+    const c = new Case({
+      id: this.client.settings.caseID,
+      type: 'UNMUTE',
+      date: Date.now(),
+      until: undefined,
+      modID: msg.author.id,
+      modTag: msg.author.tag,
+      reason: reason,
+      duration: null,
+      warnPointsAdded: 0,
+      currentWarnPoints: user.settings.warnPoints
+    });
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await user.settings.update('cases', c, { action: 'add' });
+    return c;
+  }
+
+  sendEmbed(msg, member, reason, c) {
+    const channelID = msg.guild.settings.channels.public;
+    if (!channelID) return;
     const embed = new MessageEmbed()
       .setTitle('Member Unmuted')
       .setThumbnail(member.user.avatarURL({format: 'jpg'}))
@@ -44,6 +60,6 @@ module.exports = class extends Command {
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
-    return this.client.channels.cache.get(logChId).send(embed);
+    return this.client.channels.cache.get(channelID).send(embed);
   }
 };

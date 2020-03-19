@@ -7,9 +7,10 @@ module.exports = class extends Command {
     super(...args, {
       enabled: true,
       runIn: ['text'],
-      requiredPermissions: [],
+      requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
       requiredSettings: [],
       guarded: false,
+      permissionLevel: 5,
       description: '',
       extendedHelp: 'No extended help available.',
       usage: '[user:user]',

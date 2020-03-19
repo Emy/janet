@@ -13,8 +13,8 @@ module.exports = class extends Event {
     if (oldMsg.author.bot) return;
     if (!newMsg.content || !oldMsg.content) return;
     if (oldMsg.content === newMsg.content) return;
-    const logChId = oldMsg.guild.settings.get('privateLogChannel')
-    if (!logChId) return;
+    const channelID = oldMsg.guild.settings.channels.private;
+    if (!channelID) return;
     const embed = new MessageEmbed()
       .setTitle('Message Updated')
       .setThumbnail(oldMsg.author.avatarURL({format: 'jpg'}))
@@ -24,7 +24,7 @@ module.exports = class extends Event {
       .addField('New Message', newMsg.content)
       .addField('Channel', `<#${oldMsg.channel.id}>`)
       .setTimestamp();
-      this.client.channels.cache.get(logChId).send(embed);
+      this.client.channels.cache.get(channelID).send(embed);
   }
 
   async init() {}

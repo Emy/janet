@@ -7,7 +7,7 @@ module.exports = class extends Command {
     super(...args, {
       enabled: true,
       runIn: ['text'],
-      requiredPermissions: [],
+      requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
       requiredSettings: [],
       aliases: [],
       description: '',
@@ -16,6 +16,12 @@ module.exports = class extends Command {
   }
 
   async run(msg, [...params]) {
+    if (!await msg.hasAtLeastPermissionLevel(5)) {
+      if (!msg.guild.settings.channels.botspam) return;
+      if(msg.channel.id != msg.guild.settings.channels.botspam) {
+        return msg.send(`Command only allowed in <#${msg.guild.settings.channels.botspam}>`);
+      }
+    }
     const leaderboard = this.client.users.cache.sort((a,b) => {
       if (a.settings.xp > b.settings.xp) return -1;
       if (a.settings.xp < b.settings.xp) return 1;
@@ -23,7 +29,10 @@ module.exports = class extends Command {
     }).array().slice(0, 10);
     let counter = 1;
     const embed = new MessageEmbed()
-      .setTitle('Leaderboard');
+      .setTitle('Leaderboard')
+      .setDescription(`${msg.guild.name}'s Leaderboard`)
+      .setColor('GREEN')
+      .setTimestamp();
     leaderboard.forEach((user) => {
       embed.addField(`#${counter++} - Level ${user.settings.level}`, `<@${user.id}>`)
     });

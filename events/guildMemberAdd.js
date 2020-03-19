@@ -11,7 +11,8 @@ module.exports = class extends Event {
   }
 
   async run(member) {
-    if (!member.guild.settings.get('privateLogChannel')) return;
+    let channelID = member.guild.settings.channels.private
+    if (!channelID) return;
     const embed = new MessageEmbed()
     .setTitle('Member Joined')
     .setThumbnail(member.user.avatarURL({format: 'jpg'}))
@@ -22,13 +23,14 @@ module.exports = class extends Event {
     .addField('Created', member.user.createdAt)
     .setTimestamp()
     .setFooter(member.user.id);
-    this.client.channels.cache.get(member.guild.settings.get('privateLogChannel')).send(embed);
-
+    this.client.channels.cache.get(channelID).send(embed);
+    channelID = member.guild.settings.channels.reports
+    if (!channelID) return;
     if (member.user.settings.get('isMuted')) {
       await member.roles.add(member.guild.settings.roles.muted);
       embed.setTitle('Mute Evasion')
       .setColor('RED')
-      this.client.channels.cache.get(member.guild.settings.get('privateLogChannel')).send(embed);
+      this.client.channels.cache.get(channelID).send(embed);
     }
   }
 

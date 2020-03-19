@@ -4,8 +4,8 @@ module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      enabled: true,
-      runIn: ['text', 'dm', 'group'],
+      enabled: false,
+      runIn: ['text'],
       requiredPermissions: [],
       requiredSettings: [],
       aliases: [],
@@ -17,7 +17,7 @@ module.exports = class extends Command {
       deletable: false,
       guarded: false,
       nsfw: false,
-      permissionLevel: 0,
+      permissionLevel: 7,
       description: '',
       extendedHelp: 'No extended help available.',
       usage: '',
@@ -29,16 +29,9 @@ module.exports = class extends Command {
 
   async run(msg, [...params]) {
     const everyone = msg.guild.roles.cache.first();
-    const bool = msg.channel.permissionsFor(everyone).has('SEND_MESSAGES');
-    try {
-      await msg.channel.updateOverwrite(everyone, {SEND_MESSAGES: !bool});
-      const titleLocalized = bool ? 'CHANNEL_LOCKED' : 'CHANNEL_UNLOCKED';
-      msg.genEmbed()
-          .setTitle(`${titleLocalized}`)
-          .setColor(bool ? '#ff8b94' : '#a8e6cf')
-          .send();
-    } catch (err) {
-    }
+    const isLocked = msg.channel.permissionsFor(everyone).has('SEND_MESSAGES');
+    await msg.channel.updateOverwrite(everyone, {SEND_MESSAGES: !isLocked});
+    msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`)
   }
 
   async init() {}

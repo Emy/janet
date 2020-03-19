@@ -1,5 +1,6 @@
 const { Command } = require('klasa');
 const { MessageEmbed } = require('discord.js');
+const moment = require('moment');
 const Case = require('../../util/case');
 
 module.exports = class extends Command {
@@ -11,7 +12,7 @@ module.exports = class extends Command {
       requiredPermissions: ['MANAGE_ROLES'],
       requiredSettings: [],
       guarded: true,
-      permissionLevel: 0,
+      permissionLevel: 5,
       description: '',
       extendedHelp: 'No extended help available.',
       usage: '<member:member> [duration:time] [reason:...string]',
@@ -20,19 +21,15 @@ module.exports = class extends Command {
   }
 
   async run(msg, [member, duration, reason]) {
-    if (member.id === this.client.user.id) return 'bot not mutable';
-    if (member.id === msg.author.id) return 'cant mute yourself';
-    if (member.roles.highest.position >= msg.member.roles.highest.position) return 'role height';
-    if (member.roles.cache.has(msg.guild.settings.roles.muted)) return 'already muted';
+    if (member.id === this.client.user.id) return msg.send('I cannot mute myself.');
+    if (member.id === msg.author.id) return msg.send('You cannot mute yourself.');
+    if (member.roles.highest.position >= msg.member.roles.highest.position) return msg.send('Your highest role is even or lower than the target users role.');
+    if (member.roles.cache.has(msg.guild.settings.roles.muted)) return msg.send('Target is already muted.');
 
     await member.roles.add(msg.guild.settings.roles.muted);
+    await member.user.settings.update('isMuted', true);
 
-    const c = await Case(this.client, msg, member.user, {
-      type: 'MUTE',
-      reason: reason,
-      duration: duration ? duration : null,
-      warnPointsAdded: 0
-    });
+    const c = await this.buildCase(msg, reason, member.user, duration);
 
     if (duration) {
       await this.client.schedule.create('unmute', duration, {
@@ -49,20 +46,38 @@ module.exports = class extends Command {
 
   async init() {}
 
+  async buildCase(msg, reason, user, duration) {
+    const c = new Case({
+      id: this.client.settings.caseID,
+      type: 'MUTE',
+      date: Date.now(),
+      until: duration,
+      modID: msg.author.id,
+      modTag: msg.author.tag,
+      reason: reason,
+      duration: duration ? moment().to(duration.toISOString(), true) : 'PERMANENT',
+      warnPointsAdded: 0,
+      currentWarnPoints: user.settings.warnPoints
+    });
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await user.settings.update('cases', c, { action: 'add' });
+    return c;
+  }
+
   sendEmbed(msg, member, reason, duration, c) {
-    const logChId = msg.guild.settings.get('publicLogChannel');
-    if (!logChId) return 'logchannel';
+    const channelID = msg.guild.settings.channels.public;
+    if (!channelID) return 'logchannel';
     const embed = new MessageEmbed()
       .setTitle('Member Muted')
       .setThumbnail(member.user.avatarURL({format: 'jpg'}))
       .setColor('RED')
       .addField('Member', `${member.user.tag} (<@${member.id}>)`)
       .addField('Mod', msg.author.tag)
-      .addField('Duration', duration ? duration : 'PERMANENT')
+      .addField('Duration', duration ? moment().to(duration.toISOString(), true) : 'PERMANENT')
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
-    return this.client.channels.cache.get(logChId).send(embed);
+    return this.client.channels.cache.get(channelID).send(embed);
   }
 
 };

@@ -1,12 +1,10 @@
 const { Command } = require('klasa');
-const FilteredWord = require('../../util/filteredWord')
 
 module.exports = class extends Command {
-
   constructor(...args) {
     super(...args, {
       enabled: true,
-      runIn: ['text'],
+      runIn: ['text', 'dm', 'group'],
       requiredPermissions: [],
       requiredSettings: [],
       aliases: [],
@@ -18,24 +16,25 @@ module.exports = class extends Command {
       deletable: false,
       guarded: false,
       nsfw: false,
-      permissionLevel: 5,
+      permissionLevel: 4,
       description: '',
       extendedHelp: 'No extended help available.',
-      usage: '<priority:integer> <word:...string>',
-      usageDelim: ' ',
+      usage: '[prio:integer]',
+      usageDelim: undefined,
       quotedStringSupport: false,
       subcommands: false
     });
   }
 
-  async run(msg, [priority, word]) {
-    const fw = new FilteredWord({
-      word: word,
-      priority: priority
+  async run(msg, [prio]) {
+    let content = 'Filterwords: '
+    msg.guild.settings.filter.words.forEach((fw) => {
+      if (prio === undefined) content = content + `${fw.word} (${fw.priority}), `;
+      if (prio === fw.priority) content = content + `${fw.word} (${fw.priority}), `;
     });
-    await msg.guild.settings.update('filter.words', fw, { action: 'add' });
-    msg.send(`Added ${word} with priority ${priority}.`);
+    msg.send(content);
   }
 
   async init() {}
+
 };

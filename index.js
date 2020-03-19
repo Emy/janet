@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const { Client } = require('klasa');
+const { Client, PermissionLevels } = require('klasa');
 // const { Shoukaku } = require('shoukaku');
 const { config, token } = require('./config');
 // const Queue = require('./util/queue');
@@ -26,26 +26,35 @@ class JanetClient extends Client {
   constructor(...args) {
     super(...args);
     Client.defaultClientSchema
-      .add('caseID', 'integer', { default: 0, min: 0 })
+      .add('caseID', 'integer', { default: 0, min: 0, configurable: false })
     Client.defaultGuildSchema
-      .add('roles', folder => {
+      .add('roles', (folder) => {
         folder.add('muted', 'role')
         folder.add('genius', 'role')
         folder.add('moderator', 'role')
       })
-      .add('filterWords', 'filteredword', { array: true })
-      .add('excludedChannels', 'textchannel', { array: true })
-      .add('publicLogChannel', 'textchannel')
-      .add('privateLogChannel', 'textchannel')
-      .add('reportChannel', 'textchannel');
+      .add('channels', (folder) => {
+        folder.add('public', 'textchannel');
+        folder.add('private', 'textchannel');
+        folder.add('reports', 'textchannel');
+        folder.add('botspam', 'textchannel');
+      })
+      .add('filter', (folder) => {
+        folder.add('enableWordFiltering', 'boolean', { default: true }),
+        folder.add('enableSpoilerFiltering', 'boolean', { default: true });
+        folder.add('words', 'filteredword', {array: true, configurable: false });
+        folder.add('excludedChannels', 'textchannel', { array: true });
+      })
     Client.defaultUserSchema
-      .add('clem', 'boolean', { default: false })
-      .add('xpFrozen', 'boolean', { default: false })
-      .add('warnKicked', 'boolean', { default: false })
-      .add('warnPoints', 'integer', { default: 0, min: 0 })
-      .add('xp', 'integer', { default: 0, min: 0 })
-      .add('level', 'integer', { default: 0, min: 0 })
-      .add('cases', 'case', { array: true });
+      .add('isMuted', 'boolean', { default:false, configurable: false })
+      .add('clem', 'boolean', { default: false, configurable: false })
+      .add('xpFrozen', 'boolean', { default: false, configurable: false })
+      .add('warnKicked', 'boolean', { default: false, configurable: false })
+      .add('warnPoints', 'integer', { default: 0, min: 0, configurable: false })
+      .add('xp', 'integer', { default: 0, min: 0, configurable: false })
+      .add('level', 'integer', { default: 0, min: 0, configurable: false })
+      .add('cases', 'case', { array: true, configurable: false })
+      .add('offlineReportPing', 'boolean', { default: false, configurable: false });
 
 
 
@@ -57,5 +66,25 @@ class JanetClient extends Client {
       // this.shoukaku.on('disconnected', (name, reason) => console.log(`Lavalink Node: ${name} disconnected. Reason: ${reason || 'No reason'}`));
   }
 }
+
+config.permissionLevels = new PermissionLevels()
+// everyone can use these commands
+.add(0, () => true)
+.add(1, ({ guild, member }) => (guild && guild.settings.roles.memberplus) && member.roles.cache.has(guild.settings.roles.memberplus))
+.add(2, ({ guild, member }) => (guild && guild.settings.roles.memberpro) && member.roles.cache.has(guild.settings.roles.memberpro))
+.add(3, ({ guild, member }) => (guild && guild.settings.roles.memberedition) && member.roles.cache.has(guild.settings.roles.memberedition))
+.add(4, ({ guild, member }) => (guild && guild.settings.roles.genius) && member.roles.cache.has(guild.settings.roles.genius))
+.add(5, ({ guild, member }) => (guild && guild.settings.roles.moderator) && member.roles.cache.has(guild.settings.roles.moderator))
+// Members of guilds must have 'MANAGE_GUILD' permission
+.add(6, ({ guild, member }) => guild && member.permissions.has('MANAGE_GUILD'), { fetch: true })
+// The member using this command must be the guild owner
+.add(7, ({ guild, member }) => guild && member === guild.owner, { fetch: true })
+/*
+ * Allows the Bot Owner to use any lower commands
+ * and causes any command with a permission level 9 or lower to return an error if no check passes.
+ */
+.add(9, ({ author, client }) => author === client.owner, { break: true })
+// Allows the bot owner to use Bot Owner only commands, which silently fail for other users.
+.add(10, ({ author, client }) => author === client.owner);
 
 new JanetClient(config).login(token);

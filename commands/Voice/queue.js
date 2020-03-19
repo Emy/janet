@@ -3,6 +3,7 @@ const { Command, RichDisplay } = require('klasa');
 module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
+      enabled: false,
       runIn: ['text'],
       requiredPermissions: ['EMBED_LINKS'],
       aliases: ['q'],

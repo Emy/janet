@@ -10,7 +10,7 @@ module.exports = class extends Command {
       requiredPermissions: [],
       requiredSettings: [],
       guarded: true,
-      permissionLevel: 0,
+      permissionLevel: 5,
       description: '',
       extendedHelp: 'No extended help available.',
       usage: '<member:member> <points:integer> [reason:...string]',
@@ -23,32 +23,46 @@ module.exports = class extends Command {
   async run(msg, [member, points, reason]) {
     let warnPoints = member.user.settings.warnPoints;
     await member.user.settings.update('warnPoints', warnPoints += points)
-    const c = await Case(this.client, msg, member, {
-      type: 'WARN',
-      reason: reason,
-      duration: null,
-      warnPointsAdded: points
-    });
+    const c = await this.buildCase(msg, reason, points, member.user);
+
     this.sendWarnEmbed(msg, member, points, reason, c);
     if (warnPoints >= 600) {
       if (!member.bannable) return msg.send('Could not ban.');
       await member.ban({ days: 1, reason: '600 or more Warnpoints reached.' });
-      await this.sendBanEmbed(msg, member);
+      await this.sendBanEmbed(msg, member, points);
     }
 
     if (warnPoints >= 400 && !member.user.settings.warnKicked) {
       if (!member.kickable) return msg.send('Could not kick.');
       await member.kick('400 or more Warnpoints reached.');
       await member.user.settings.update('warnKicked', true);
-      await this.sendKickEmbed(msg, member);
+      await this.sendKickEmbed(msg, member, points);
     }
   }
 
   async init() {}
 
+  async buildCase(msg, reason, points, user) {
+    const c = new Case({
+      id: this.client.settings.caseID,
+      type: 'WARN',
+      date: Date.now(),
+      until: undefined,
+      modID: msg.author.id,
+      modTag: msg.author.tag,
+      reason: reason,
+      duration: null,
+      warnPointsAdded: points,
+      currentWarnPoints: user.settings.warnPoints
+    });
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await user.settings.update('cases', c, { action: 'add' });
+    return c;
+  }
+
   sendWarnEmbed(msg, member, points, reason = 'No reason.', c) {
-    const logChId = msg.guild.settings.get('publicLogChannel');
-    if (!logChId) return;
+    const channelID = msg.guild.settings.channels.public;
+    if (!channelID) return;
     const embed = new MessageEmbed()
       .setTitle('Member Warned')
       .setThumbnail(member.user.avatarURL( {format: 'jpg'} ))
@@ -59,20 +73,26 @@ module.exports = class extends Command {
       .addField('Reason', reason)
       .setFooter(`Case #${c.id} | ${member.user.id}`)
       .setTimestamp()
-      this.client.channels.cache.get(logChId).send(embed);
+      this.client.channels.cache.get(channelID).send(embed);
   }
 
-  async sendKickEmbed(msg, member) {
-    const c = await Case(this.client, msg, member, {
+  async sendKickEmbed(msg, member, points) {
+    const c = new Case({
+      id: this.client.settings.caseID,
       type: 'KICK',
+      date: Date.now(),
+      until: undefined,
       modID: this.client.user.id,
       modTag: this.client.user.tag,
       reason: '400 or more Warnpoints reached.',
       duration: null,
-      warnPointsAdded: points
+      warnPointsAdded: points,
+      currentWarnPoints: member.user.settings.warnPoints
     });
-    const logChId = msg.guild.settings.get('publicLogChannel');
-    if (!logChId) return;
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await member.user.settings.update('cases', c, { action: 'add' });
+    const channelID = msg.guild.settings.channels.public;
+    if (!channelID) return;
     const embed = new MessageEmbed()
       .setTitle('Member Kicked')
       .setThumbnail(member.user.avatarURL( {format: 'jpg'} ))
@@ -82,20 +102,26 @@ module.exports = class extends Command {
       .addField('Reason', '400 or more Warnpoints reached.')
       .setFooter(`Case #${c.id} | ${member.user.id}`)
       .setTimestamp()
-      this.client.channels.cache.get(logChId).send(embed);
+      this.client.channels.cache.get(channelID).send(embed);
   }
 
-  async sendBanEmbed(msg, member) {
-    const c = await Case(this.client, msg, member.user, {
+  async sendBanEmbed(msg, member, points) {
+    const c = new Case({
+      id: this.client.settings.caseID,
       type: 'BAN',
+      date: Date.now(),
+      until: undefined,
       modID: this.client.user.id,
       modTag: this.client.user.tag,
       reason: '600 or more Warnpoints reached.',
       duration: null,
-      warnPointsAdded: points
+      warnPointsAdded: points,
+      currentWarnPoints: member.user.settings.warnPoints
     });
-    const logChId = msg.guild.settings.get('publicLogChannel');
-    if (!logChId) return;
+    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await member.user.settings.update('cases', c, { action: 'add' });
+    const channelID = msg.guild.settings.channels.public;
+    if (!channelID) return;
     const embed = new MessageEmbed()
       .setTitle('Member Banned')
       .setThumbnail(member.user.avatarURL( {format: 'jpg'} ))
@@ -105,6 +131,6 @@ module.exports = class extends Command {
       .addField('Reason', '600 or more Warnpoints reached.')
       .setFooter(`Case #${c.id} | ${member.user.id}`)
       .setTimestamp()
-      this.client.channels.cache.get(logChId).send(embed);
+      this.client.channels.cache.get(channelID).send(embed);
   }
 };

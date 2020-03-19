@@ -16,10 +16,10 @@ module.exports = class extends Monitor {
   async run(message) {
     if (message.author.settings.xpFrozen) return;
     let gainedXP = Math.floor(Math.random() * 10 + 1)
-    if (message.member.lastMessage.content === message.content) gainedXP = -1;
+    //if (message.member.lastMessage.content === message.content) gainedXP = gainedXP * -1;
     const currentXP = message.author.settings.xp;
     await message.author.settings.update('xp', currentXP + gainedXP);
-    await message.author.settings.update('level', this.getLevel(currentXP + gainedXP)) 
+    await message.author.settings.update('level', this.getLevel(currentXP + gainedXP))
   }
 
   async init() {}
@@ -31,6 +31,6 @@ module.exports = class extends Monitor {
         xp = xp + 45 * level * (Math.floor(parseInt(level) / 10) + 1)
         level++
     }
-    return --level;
+    return level;
   }
 };
