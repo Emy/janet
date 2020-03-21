@@ -15,6 +15,14 @@ module.exports = class extends Event {
     if (oldMember.nickname != newMember.nickname) {
       const channelID = oldMember.guild.settings.channels.private;
       if (!channelID) return;
+
+      if (msg.guild.settings.filter.enableWordFiltering) {
+        for (filteredWord of msg.guild.settings.filter.words) {
+          if (!newMember.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
+          newMember.setNickname('change name pls', 'filtered word');
+        }
+      }
+
       const embed = new MessageEmbed()
         .setTitle('Member Renamed')
         .setThumbnail(oldMember.user.avatarURL({ format: 'jpg' }))

@@ -13,6 +13,14 @@ module.exports = class extends Event {
   async run(member) {
     let channelID = member.guild.settings.channels.private
     if (!channelID) return;
+
+    if (msg.guild.settings.filter.enableWordFiltering) {
+      for (filteredWord of msg.guild.settings.filter.words) {
+        if (!newMember.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
+        newMember.setNickname('change name pls', 'filtered word');
+      }
+    }
+
     const embed = new MessageEmbed()
     .setTitle('Member Joined')
     .setThumbnail(member.user.avatarURL({format: 'jpg'}))
