@@ -10,7 +10,7 @@ module.exports = class extends Command {
       requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
       requiredSettings: [],
       aliases: [],
-      description: '',
+      description: 'Views the Top 10 members with the most XP on server.',
       extendedHelp: 'No extended help available.',
     });
   }

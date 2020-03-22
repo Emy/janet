@@ -13,8 +13,8 @@ module.exports = class extends Command {
       requiredSettings: [],
       guarded: true,
       permissionLevel: 5,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Mutes a member with optional time and/or reason.',
+      extendedHelp: '<usertag | userid> [optional: duration (m = minutes, h = hours, d = days)] [optional: reason]',
       usage: '<member:member> [duration:time] [reason:...string]',
       usageDelim: ' ',
     });

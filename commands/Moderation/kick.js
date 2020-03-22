@@ -11,8 +11,8 @@ module.exports = class extends Command {
       requiredPermissions: ['KICK_MEMBERS'],
       guarded: true,
       permissionLevel: 5,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Kicks a member from the server.',
+      extendedHelp: '<usertag | userid> [optional: reason]',
       usage: '<member:member> [reason:...string]',
       usageDelim: ' ',
     });
