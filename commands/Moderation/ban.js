@@ -11,8 +11,8 @@ module.exports = class extends Command {
       requiredPermissions: ['BAN_MEMBERS'],
       guarded: true,
       permissionLevel: 5,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Bans a member from the server.',
+      extendedHelp: '!ban <usertag | userid> [optional: reason]',
       usage: '<member:member> [reason:...string]',
       usageDelim: ' ',
     });

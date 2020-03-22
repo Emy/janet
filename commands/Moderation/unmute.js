@@ -12,8 +12,8 @@ module.exports = class extends Command {
       requiredSettings: [],
       guarded: false,
       permissionLevel: 5,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Unmutes a member.',
+      extendedHelp: '!unmute <usertag | userid> [optional: reason]',
       usage: '<member:member> [reason:...string]',
       usageDelim: ' ',
     });

@@ -20,7 +20,7 @@ module.exports = class extends Command {
       guarded: false,
       nsfw: false,
       permissionLevel: 7,
-      description: '',
+      description: 'Puts a member on Clem Protocol (Server and Bot Owner only)',
       extendedHelp: 'No extended help available.',
       usage: '<member:member> [reason:...string]',
       usageDelim: ' ',

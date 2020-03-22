@@ -11,8 +11,8 @@ module.exports = class extends Command {
       requiredSettings: [],
       guarded: false,
       permissionLevel: 5,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Views total warnpoints of member.',
+      extendedHelp: '!warnpoints [optional: <usertag | userid>]',
       usage: '[user:user]',
     });
   }

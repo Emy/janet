@@ -12,8 +12,8 @@ module.exports = class extends Command {
       aliases: [],
       guarded: true,
       permissionLevel: 7,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Unbans a member. (Server Owner and Bot Owner only)',
+      extendedHelp: '!unban <userid> [optional: reason]',
       usage: '<user:user> [reason:...string]',
       usageDelim: ' ',
     });

@@ -8,7 +8,8 @@ module.exports = class extends Command {
       permissionLevel: 5,
       requiredPermissions: ['MANAGE_MESSAGES'],
       runIn: ['text'],
-      description: 'Purges a certain amount of messages w/o filter.',
+      description: 'Purges a certain amount of messages between 1 and 100.',
+      extendedHelp: '!purge <amount> [optional: link (website links) | invite (discord invites) | bots (any bot) | you (the bot) | me (yourself) | upload (attachments) | user (usertag | userid)',
       usage: '<limit:integer> [link|invite|bots|you|me|upload|user:user]',
       usageDelim: ' '
     });

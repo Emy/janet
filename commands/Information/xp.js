@@ -12,8 +12,8 @@ module.exports = class extends Command {
       aliases: ['xpstats'],
       guarded: false,
       permissionLevel: 0,
-      description: '',
-      extendedHelp: 'No extended help available.',
+      description: 'Views xp of self or member.',
+      extendedHelp: '!xp [optional: <usertag | userid>',
       usage: '[user:user]',
     });
   }

@@ -18,7 +18,7 @@ module.exports = class extends Command {
       guarded: false,
       nsfw: false,
       permissionLevel: 7,
-      description: '',
+      description: 'Locks the channel by blocking @everyone from sending messages.',
       extendedHelp: 'No extended help available.',
       usage: '',
       usageDelim: undefined,
