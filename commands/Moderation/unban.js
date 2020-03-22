@@ -56,8 +56,8 @@ module.exports = class extends Command {
       .setTitle('Member Unbanned')
       .setThumbnail(user.avatarURL({ format: 'jpg' }))
       .setColor('GREEN')
-      .addField('Member', user.tag, true)
-      .addField('Mod', msg.author.tag, true)
+      .addField('Member', `${user.tag} (<@${user.id}>)`, true)
+      .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${user.id}`)
       .setTimestamp();

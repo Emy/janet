@@ -51,6 +51,7 @@ module.exports = class extends Monitor {
       .setColor('RED')
       .addField('Member', `${msg.member.user.tag} (<@${msg.member.user.id}>)`, true)
       .addField('Priority', highestPrio, true)
+      .addField('Channel', `<#${msg.channel.id}>`)
       .addField('Message', msg.content)
       .setTimestamp()
       this.client.channels.cache.get(channelID).send(embed);

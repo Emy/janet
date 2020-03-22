@@ -16,8 +16,9 @@ module.exports = class extends Event {
       const channelID = oldMember.guild.settings.channels.private;
       if (!channelID) return;
 
-      if (msg.guild.settings.filter.enableWordFiltering) {
-        for (filteredWord of msg.guild.settings.filter.words) {
+      if (oldMember.guild.settings.filter.enableWordFiltering) {
+        for (let filteredWord of oldMember.guild.settings.filter.words) {
+          if (!newMember.nickname) continue;
           if (!newMember.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
           newMember.setNickname('change name pls', 'filtered word');
         }
@@ -34,8 +35,6 @@ module.exports = class extends Event {
         .setTimestamp();
         this.client.channels.cache.get(channelID).send(embed);
     }
-    
-
   }
 
   async init() {}

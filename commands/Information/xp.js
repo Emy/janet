@@ -43,10 +43,12 @@ module.exports = class extends Command {
       .setTitle('Level Statistics')
       .setColor('GREEN')
       .setThumbnail(user.avatarURL({ format: 'jpg' }))
-      .addField('Member', user.tag)
+      .addField('Member', `${user.tag} (<@${user.id}>)`)
       .addField('Level', user.settings.get('level'), true)
       .addField('XP', user.settings.get('xp'), true)
-      .addField('Rank', `${rank} / ${leaderboard.length}`, true);
+      .addField('Rank', `${rank} / ${leaderboard.length}`, true)
+      .setFooter(user.id)
+      .setTimestamp();
     msg.send(embed);
   }
 

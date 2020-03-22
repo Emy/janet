@@ -15,11 +15,14 @@ module.exports = class extends Event {
     if (!channelID) return;
     if (!msg.content) return;
     if (msg.channel.id === channelID) return;
+    for(let channel of msg.guild.settings.logging.excludedChannels) {
+      if (msg.channel.id === channel) return;
+    }
     const embed = new MessageEmbed()
     .setTitle('Message Deleted')
     .setThumbnail(msg.author.avatarURL({format: 'jpg'}))
-    .setColor('RED')
-    .addField('User', msg.author.tag, true)
+    .setColor('#FF0000')
+    .addField('User', `${msg.author.tag} (<@${msg.author.id}>)`, true)
     .addField('Channel', `<#${msg.channel.id}>`, true)
     .addField('Message', msg.content)
     .setFooter(msg.member.user.id)

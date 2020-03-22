@@ -48,6 +48,9 @@ class JanetClient extends Client {
         folder.add('words', 'filteredword', {array: true, configurable: false });
         folder.add('excludedChannels', 'textchannel', { array: true });
       })
+      .add('logging', (folder) => {
+        folder.add('excludedChannels', 'textchannel', {array: true });
+      })
     Client.defaultUserSchema
       .add('isMuted', 'boolean', { default:false, configurable: false })
       .add('clem', 'boolean', { default: false, configurable: false })

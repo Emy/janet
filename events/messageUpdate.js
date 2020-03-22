@@ -15,11 +15,14 @@ module.exports = class extends Event {
     if (oldMsg.content === newMsg.content) return;
     const channelID = oldMsg.guild.settings.channels.private;
     if (!channelID) return;
+    for(let channel of oldMsg.guild.settings.logging.excludedChannels) {
+      if (oldMsg.channel.id === channel) return;
+    }
     const embed = new MessageEmbed()
       .setTitle('Message Updated')
       .setThumbnail(oldMsg.author.avatarURL({format: 'jpg'}))
       .setColor('BLUE')
-      .addField('User', oldMsg.author.tag)
+      .addField('User', `${oldMsg.author.tag} (<@${oldMsg.author.id}>)`)
       .addField('Old Message', oldMsg.content)
       .addField('New Message', newMsg.content)
       .addField('Channel', `<#${oldMsg.channel.id}>`)

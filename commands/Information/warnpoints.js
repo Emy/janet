@@ -23,8 +23,10 @@ module.exports = class extends Command {
       .setTitle('Warn Points')
       .setColor('ORANGE')
       .setThumbnail(user.avatarURL({ format: 'jpg' }))
-      .addField('Member', user.tag)
-      .addField('Warn Points', user.settings.get('warnPoints'));
+      .addField('Member', `${user.tag} (<@${user.id}>)`)
+      .addField('Warn Points', user.settings.get('warnPoints'))
+      .setFooter(user.id)
+      .setTimestamp();
     msg.send(embed);
   }
 

@@ -15,8 +15,8 @@ module.exports = class extends Event {
     const embed = new MessageEmbed()
     .setTitle('Member Left')
     .setThumbnail(member.user.avatarURL({format: 'jpg'}))
-    .setColor('RED')
-    .addField('User', member.user.tag)
+    .setColor('#9012FE')
+    .addField('User', `${member.user.tag} (<@${member.user.id}>)`)
     .setFooter(member.user.id)
     this.client.channels.cache.get(member.guild.settings.channels.private).send(embed);
   }

@@ -14,10 +14,11 @@ module.exports = class extends Event {
     let channelID = member.guild.settings.channels.private
     if (!channelID) return;
 
-    if (msg.guild.settings.filter.enableWordFiltering) {
-      for (filteredWord of msg.guild.settings.filter.words) {
-        if (!newMember.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
-        newMember.setNickname('change name pls', 'filtered word');
+    if (member.guild.settings.filter.enableWordFiltering) {
+      for (let filteredWord of member.guild.settings.filter.words) {
+        if (!member.nickname) continue;
+        if (!member.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
+        member.setNickname('change name pls', 'filtered word');
       }
     }
 
@@ -25,7 +26,7 @@ module.exports = class extends Event {
     .setTitle('Member Joined')
     .setThumbnail(member.user.avatarURL({format: 'jpg'}))
     .setColor('GREEN')
-    .addField('User', member.user.tag, true)
+    .addField('User', `${member.user.tag} (<@${member.user.id}>)`, true)
     .addField('Warnpoints', member.user.settings.warnPoints, true)
     .addField('Joined', member.joinedAt)
     .addField('Created', member.user.createdAt)

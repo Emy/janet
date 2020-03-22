@@ -55,7 +55,7 @@ module.exports = class extends Command {
       .setThumbnail(member.user.avatarURL({format: 'jpg'}))
       .setColor('RED')
       .addField('Member', `${member.user.tag} (<@${member.id}>)`, true)
-      .addField('Mod', msg.author.tag, true)
+      .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();

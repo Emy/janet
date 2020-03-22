@@ -23,6 +23,7 @@ module.exports = class extends Command {
   async run(msg, [member, points, reason]) {
     if (points <= 0) return msg.send('🤔');
     let warnPoints = member.user.settings.warnPoints;
+    if (member.roles.highest.position >= msg.member.roles.highest.position) return msg.send('Your highest role is even or lower than the target users role.');
     await member.user.settings.update('warnPoints', warnPoints += points)
     const c = await this.buildCase(msg, reason, points, member.user);
 
@@ -68,7 +69,7 @@ module.exports = class extends Command {
       .setThumbnail(member.user.avatarURL( {format: 'jpg'} ))
       .setColor('ORANGE')
       .addField('Member', `${member.user.tag} (<@${member.user.id}>)`, true)
-      .addField('Mod', msg.author.tag, true)
+      .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
       .addField('Increase', points, true)
       .addField('Reason', reason)
       .setFooter(`Case #${c.id} | ${member.user.id}`)
