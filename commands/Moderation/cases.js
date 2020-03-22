@@ -33,9 +33,11 @@ module.exports = class extends Command {
     const display = new RichDisplay()
     let counter = 0;
     let embed = new MessageEmbed();
+    console.log(user);
+    await user.settings.sync();
     user.settings.cases.forEach((c) => {
       embed.addField(
-        `#${c.id} ${c.type} - Mod: ${c.modTag} Reason: ${c.reason}`,
+        `#${c.id} ${c.type} - Mod: ${c.modTag} Reason: ${c.reason} Punishment: ${c.punishment}`,
         `At: ${moment(new Date(c.date).toISOString()).format('LL')}`);
         counter++;
         if (counter % 10 == 0) {
@@ -46,7 +48,6 @@ module.exports = class extends Command {
     if (counter % 10 !== 0) display.addPage(embed);
 
     display.run(msg);
-
     console.log(user.settings.cases);
   }
 

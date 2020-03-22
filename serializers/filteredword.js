@@ -7,12 +7,12 @@ module.exports = class extends Serializer {
     return new FilteredWord(data);
 	}
 
-	serialize(c) {
-		return c;
+	serialize(data) {
+		return data;
 	}
 
-	stringify(c) {
-		return c;
+	stringify(data) {
+		return data;
 	}
 
 };

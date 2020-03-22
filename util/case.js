@@ -7,8 +7,7 @@ class Case {
     this.modID = options.modID;
     this.modTag = options.modTag;
     this.reason = options.reason;
-    this.duration = options.duration;
-    this.warnPointsAdded = options.warnPointsAdded;
+    this.punishment = options.punishment,
     this.currentWarnPoints = options.currentWarnPoints
   }
 }

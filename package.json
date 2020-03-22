@@ -9,8 +9,11 @@
   "dependencies": {
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
+    "fs-nextra": "^0.4.7",
     "klasa": "dirigeants/klasa",
     "moment": "^2.24.0",
-    "shoukaku": "Deivu/Shoukaku"
+    "pg": "^7.18.2",
+    "shoukaku": "Deivu/Shoukaku",
+    "sqlite": "^3.0.3"
   }
 }

@@ -39,8 +39,7 @@ module.exports = class extends Command {
       modID: msg.author.id,
       modTag: msg.author.tag,
       reason: reason,
-      duration: 'PERMANENT',
-      warnPointsAdded: 0,
+      punishment: 'PERMANENT',
       currentWarnPoints: user.settings.warnPoints
     });
     await this.client.settings.update('caseID', this.client.settings.caseID + 1);

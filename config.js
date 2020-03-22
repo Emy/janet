@@ -49,18 +49,16 @@ exports.config = {
    * Database Options
    */
   providers: {
-    /*
-    // Provider Connection object for process based databases:
-    // rethinkdb, mongodb, mssql, mysql, postgresql
-    mysql: {
-      host: 'localhost',
-      db: 'klasa',
-      user: 'database-user',
-      password: 'database-password',
-      options: {}
-    },
-    */
-    default: 'json'
+   postgresql: {
+     host: process.env.DB_HOST,
+     port: process.env.DB_PORT,
+     database: process.env.DB_NAME,
+     user: process.env.DB_USER,
+     password: process.env.DB_PASSWORD,
+     options: {}
+   },
+
+    default: 'postgresql'
   },
 
   /**

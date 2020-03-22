@@ -21,6 +21,7 @@ module.exports = class extends Command {
   }
 
   async run(msg, [member, points, reason]) {
+    if (points <= 0) return msg.send('🤔');
     let warnPoints = member.user.settings.warnPoints;
     await member.user.settings.update('warnPoints', warnPoints += points)
     const c = await this.buildCase(msg, reason, points, member.user);
@@ -51,8 +52,7 @@ module.exports = class extends Command {
       modID: msg.author.id,
       modTag: msg.author.tag,
       reason: reason,
-      duration: null,
-      warnPointsAdded: points,
+      punishment: points,
       currentWarnPoints: user.settings.warnPoints
     });
     await this.client.settings.update('caseID', this.client.settings.caseID + 1);
@@ -85,8 +85,7 @@ module.exports = class extends Command {
       modID: this.client.user.id,
       modTag: this.client.user.tag,
       reason: '400 or more Warnpoints reached.',
-      duration: null,
-      warnPointsAdded: points,
+      punishment: undefined,
       currentWarnPoints: member.user.settings.warnPoints
     });
     await this.client.settings.update('caseID', this.client.settings.caseID + 1);
@@ -114,8 +113,7 @@ module.exports = class extends Command {
       modID: this.client.user.id,
       modTag: this.client.user.tag,
       reason: '600 or more Warnpoints reached.',
-      duration: null,
-      warnPointsAdded: points,
+      punishment: 'PERMANENT',
       currentWarnPoints: member.user.settings.warnPoints
     });
     await this.client.settings.update('caseID', this.client.settings.caseID + 1);

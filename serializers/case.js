@@ -3,16 +3,16 @@ const Case = require('../util/case')
 
 module.exports = class extends Serializer {
 
-	async deserialize(data, piece, language) {
+	deserialize(data, piece, language) {
     return new Case(data);
 	}
 
-	serialize(c) {
-		return c;
+	serialize(data) {
+		return data;
 	}
 
-	stringify(c) {
-		return c;
+	stringify(data) {
+		return data;
 	}
 
 };

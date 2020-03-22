@@ -30,6 +30,9 @@ class JanetClient extends Client {
     Client.defaultGuildSchema
       .add('roles', (folder) => {
         folder.add('muted', 'role')
+        folder.add('memberplus', 'role')
+        folder.add('memberpro', 'role')
+        folder.add('memberedition', 'role')
         folder.add('genius', 'role')
         folder.add('moderator', 'role')
       })
@@ -53,7 +56,7 @@ class JanetClient extends Client {
       .add('warnPoints', 'integer', { default: 0, min: 0, configurable: false })
       .add('xp', 'integer', { default: 0, min: 0, configurable: false })
       .add('level', 'integer', { default: 0, min: 0, configurable: false })
-      .add('cases', 'case', { array: true, configurable: false })
+      .add('cases', 'any', { array: true, configurable: false })
       .add('offlineReportPing', 'boolean', { default: false, configurable: false });
 
 
