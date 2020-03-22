@@ -16,7 +16,6 @@ module.exports = class extends Command {
     if (!msg.checkVoicePermission()) return;
     const lang = msg.language;
     const dispatcher = this.client.queue.get(msg.guild.id);
-    console.log(dispatcher);
     // Create the rich display
     const display = new RichDisplay();
 

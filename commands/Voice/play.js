@@ -23,15 +23,12 @@ module.exports = class extends Command {
     if (!tracks) {
       return 'no tracks found...';
     } // no tracks found
-    console.log(tracks);
     if (Array.isArray(tracks)) {
       const dispatcher = await this.client.queue.handleTrack(node, tracks.shift(), msg);
       tracks.forEach((track) => {
         this.client.queue.handleTrack(node, track, msg);
       });
       // Added playlist
-      console.log(tracks.name);
-      console.log(tracks.length);
       if (dispatcher) return await dispatcher.play();
       // Now playing
     }
