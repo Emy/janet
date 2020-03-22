@@ -33,7 +33,6 @@ module.exports = class extends Command {
     const display = new RichDisplay()
     let counter = 0;
     let embed = new MessageEmbed();
-    console.log(user);
     await user.settings.sync();
     user.settings.cases.forEach((c) => {
       embed.addField(
@@ -48,7 +47,6 @@ module.exports = class extends Command {
     if (counter % 10 !== 0) display.addPage(embed);
 
     display.run(msg);
-    console.log(user.settings.cases);
   }
 
   async init() {}
