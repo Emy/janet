@@ -12,9 +12,6 @@ module.exports = class extends Event {
   }
 
   async run(member) {
-    let channelID = member.guild.settings.channels.private
-    if (!channelID) return;
-
     if (member.guild.settings.filter.enableWordFiltering) {
 
       const nick = ASCIIFolder.foldMaintaining(member.displayName).toLowerCase();
@@ -24,6 +21,13 @@ module.exports = class extends Event {
         member.setNickname('change name pls', 'filtered word');
       }
     }
+
+    if (member.guild.settings.roles.member) {
+      member.roles.add(member.guild.settings.roles.member);
+    }
+
+    let channelID = member.guild.settings.channels.private
+    if (!channelID) return;
 
     const embed = new MessageEmbed()
     .setTitle('Member Joined')

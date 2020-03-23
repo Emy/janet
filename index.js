@@ -30,6 +30,7 @@ class JanetClient extends Client {
     Client.defaultGuildSchema
       .add('roles', (folder) => {
         folder.add('muted', 'role')
+        folder.add('member', 'role')
         folder.add('memberplus', 'role')
         folder.add('memberpro', 'role')
         folder.add('memberedition', 'role')
