@@ -1,8 +1,10 @@
-const { Command } = require('klasa');
+import { KlasaClient, CommandStore, KlasaMessage } from "klasa";
+
+let { Command } = require('klasa');
 
 module.exports = class extends Command {
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: false,
       runIn: ['text'],
       requiredPermissions: ['EMBED_LINKS'],
@@ -12,7 +14,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [...paran]) {
+  async run(msg: KlasaMessage, [...paran]) {
     if (!msg.checkVoicePermission()) return;
     const lang = msg.language;
     const emojis = this.client.emojis.cache;

@@ -1,8 +1,8 @@
-const { Command } = require('klasa');
+import { Command, KlasaClient, CommandStore, KlasaMessage } from 'klasa';
 
-module.exports = class extends Command {
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: false,
       runIn: ['text'],
       requiredPermissions: [],
@@ -12,7 +12,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [volume]) {
+  async run(msg: KlasaMessage, [volume]) {
     if (!msg.checkVoicePermission()) return;
     const player = this.client.music.get(msg.guild.id);
     const emojis = this.client.emojis.cache;

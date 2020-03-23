@@ -1,8 +1,8 @@
-const { Command, RichDisplay } = require('klasa');
+import { Command, RichDisplay, KlasaClient, CommandStore, KlasaMessage } from 'klasa';
 
-module.exports = class extends Command {
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: false,
       runIn: ['text'],
       requiredPermissions: ['EMBED_LINKS'],
@@ -12,7 +12,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [...params]) {
+  async run(msg: KlasaMessage, [...params]) {
     if (!msg.checkVoicePermission()) return;
     const lang = msg.language;
     const dispatcher = this.client.queue.get(msg.guild.id);

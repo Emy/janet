@@ -1,8 +1,8 @@
-const { Command } = require('klasa');
+import { Command, KlasaClient, CommandStore, KlasaMessage } from 'klasa';
 // const fetch = require('node-fetch');
 
-module.exports = class extends Command {
-  constructor(...args) {
+export default class extends Command {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
     super(...args, {
       enabled: false,
       runIn: ['text'],
@@ -14,7 +14,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [song]) {
+  async run(msg: KlasaMessage, [song]) {
     const lang = msg.language;
     if (!msg.member.voice.channel) return msg.sendError('NOT_IN_VC');
     const node = this.client.shoukaku.getNode();
