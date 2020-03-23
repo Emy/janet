@@ -2,11 +2,11 @@ type CaseOptions = {
   id: number, 
   type: string, 
   date: number, 
-  until: number, 
+  until: Date, 
   modID: string, 
   modTag: string, 
   reason: string, 
-  punishment: string, 
+  punishment: string | number, 
   currentWarnPoints: number
 }
 
@@ -14,11 +14,11 @@ export default class Case {
   id: number
   type: string
   date: number
-  until: number
+  until: Date
   modID: string
   modTag: string
   reason: string
-  punishment: string
+  punishment: string | number
   currentWarnPoints: number
 
   constructor(options: CaseOptions) {
