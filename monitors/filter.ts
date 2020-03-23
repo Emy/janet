@@ -1,10 +1,10 @@
-const { Monitor } = require('klasa');
-const { MessageEmbed } = require('discord.js');
+import { MessageEmbed, TextChannel } from 'discord.js';
+import { KlasaClient, Monitor, MonitorStore, KlasaMessage } from 'klasa';
 
-module.exports = class extends Monitor {
+export default class extends Monitor {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       ignoreBots: false,
       ignoreSelf: true,
@@ -14,35 +14,37 @@ module.exports = class extends Monitor {
     });
   }
 
-  async run(msg) {
-    if (!msg.guild.settings.filter.enableWordFiltering) return;
+  async run(msg: KlasaMessage) {
+    if (!msg.guild.settings.get('filter.enableWordFiltering')) return;
     const filteredWords = [];
     let highestPrio = -1;
-    msg.guild.settings.filter.words.forEach((filterWord) => {
+    msg.guild.settings.get('filter.words').forEach((filterWord) => {
       if (!(msg.content.toLowerCase().indexOf(filterWord.word.toLowerCase()) > -1)) return;
       filteredWords.push(filterWord.word);
       if (!(highestPrio < filterWord.priority)) return;
       highestPrio = filterWord.priority;
     });
     if (filteredWords.length === 0) return;
-    const excludedChannels = msg.guild.settings.filter.excludedChannels;
+    const excludedChannels = msg.guild.settings.get('filter.excludedChannels');
     if (excludedChannels.some((excludedChannel) => msg.channel.id == excludedChannel)) return;
 
     await msg.delete();
     if (highestPrio <= 0) return;
     const membersToPing = [];
-    msg.guild.roles.cache.get(msg.guild.settings.roles.moderator).members.map((member) => {
-      if (!(member.presence.status === 'online' || member.presence.status === 'idle' || member.user.settings.offlineReportPing)) return;
+    msg.guild.roles.cache.get(msg.guild.settings.get('roles.moderator')).members.map((member) => {
+      if (!(member.presence.status === 'online' || member.presence.status === 'idle' || member.user.settings.get('offlineReportPing'))) return;
       membersToPing.push(member);
     });
 
-    const channelID = msg.guild.settings.channels.reports;
+    const channelID = msg.guild.settings.get('channels.reports');
     if (membersToPing.length > 0) {
       let content = '';
       membersToPing.forEach((member) => {
         content+= `<@${member.user.id}> `;
       })
-      this.client.channels.cache.get(channelID).send(content);
+      
+      const channel = this.client.channels.cache.get(channelID) as TextChannel
+      channel.send(content);
     }
     if (!channelID) return;
     const embed = new MessageEmbed()
@@ -53,8 +55,10 @@ module.exports = class extends Monitor {
       .addField('Priority', highestPrio, true)
       .addField('Channel', `<#${msg.channel.id}>`)
       .addField('Message', msg.content)
+
       .setTimestamp()
-      this.client.channels.cache.get(channelID).send(embed);
+      const channel = this.client.channels.cache.get(channelID) as TextChannel
+      channel.send(embed);
   }
 
   async init() {}
