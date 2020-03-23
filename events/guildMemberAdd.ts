@@ -14,10 +14,11 @@ export default class extends Event {
     let channelID = member.guild.settings.get('channels.private')
     if (!channelID) return;
 
+    const nick = ASCIIFolder.foldMaintaining(member.displayName).toLowerCase();
+
     if (member.guild.settings.get('filter.enableWordFiltering')) {
       for (let filteredWord of member.guild.settings.get('filter.words')) {
-        if (!member.nickname) continue;
-        if (!member.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
+        if (!nick.includes(filteredWord.word.toLowerCase())) continue;
         member.setNickname('change name pls', 'filtered word');
       }
     }

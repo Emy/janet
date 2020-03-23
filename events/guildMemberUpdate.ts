@@ -1,5 +1,6 @@
 import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import { Event, EventStore, KlasaClient } from 'klasa';
+import ASCIIFolder from "fold-to-ascii"
 
 export default class extends Event {
 
@@ -16,10 +17,11 @@ export default class extends Event {
       const channelID = oldMember.guild.settings.get('channels.private');
       if (!channelID) return;
 
+      const nick = ASCIIFolder.foldMaintaining(newMember.displayName).toLowerCase();
+
       if (oldMember.guild.settings.get('filter.enableWordFiltering')) {
         for (let filteredWord of oldMember.guild.settings.get('filter.words')) {
-          if (!newMember.nickname) continue;
-          if (!newMember.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
+          if (!nick.includes(filteredWord.word.toLowerCase())) continue;
           newMember.setNickname('change name pls', 'filtered word');
         }
       }
