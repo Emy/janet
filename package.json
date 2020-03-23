@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": "https://github.com/Emy/rjbBot",
   "author": "Emy",
-  "license": "GPL-3.0-or-later",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
