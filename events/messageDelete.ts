@@ -1,21 +1,21 @@
-const { Event } = require('klasa');
-const { MessageEmbed } = require('discord.js');
+import { MessageEmbed, TextChannel } from 'discord.js';
+import { Event, EventStore, KlasaClient, KlasaMessage } from 'klasa';
 
-module.exports = class extends Event {
+export default class extends Event {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: EventStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true
     });
   }
 
-  async run(msg) {
+  async run(msg: KlasaMessage) {
     if (msg.author.bot) return;
-    const channelID = msg.guild.settings.channels.private;
+    const channelID = msg.guild.settings.get('channels.private');
     if (!channelID) return;
     if (!msg.content) return;
     if (msg.channel.id === channelID) return;
-    for(let channel of msg.guild.settings.logging.excludedChannels) {
+    for(let channel of msg.guild.settings.get('logging.excludedChannels')) {
       if (msg.channel.id === channel) return;
     }
     const embed = new MessageEmbed()
@@ -28,7 +28,8 @@ module.exports = class extends Event {
     .setFooter(msg.member.user.id)
     .setTimestamp();
     
-    this.client.channels.cache.get(channelID).send(embed);
+    const channel = this.client.channels.cache.get(channelID) as TextChannel
+    channel.send(embed);
   }
 
   async init() {}
