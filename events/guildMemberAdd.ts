@@ -1,5 +1,6 @@
 import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import { Event, EventStore, KlasaClient } from 'klasa';
+import ASCIIFolder from 'fold-to-ascii'
 
 export default class extends Event {
 
