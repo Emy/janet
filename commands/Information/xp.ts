@@ -20,16 +20,16 @@ export default class extends Command {
 
   async run(msg: KlasaMessage, [user]: [KlasaUser]) {
     if (!await msg.hasAtLeastPermissionLevel(5)) {
-      if (!msg.guild.settings.channels.botspam) return;
-      if(msg.channel.id != msg.guild.settings.channels.botspam) {
-        return msg.send(`Command only allowed in <#${msg.guild.settings.channels.botspam}>`);
+      if (!msg.guild.settings.get('channels.botspam')) return;
+      if(msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+        return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
       }
     }
     if (!user) user = msg.author;
 
     const leaderboard = this.client.users.cache.sort((a,b) => {
-      if (a.settings.xp > b.settings.xp) return -1;
-      if (a.settings.xp < b.settings.xp) return 1;
+      if (a.settings.get('xp') > b.settings.get('xp')) return -1;
+      if (a.settings.get('xp') < b.settings.get('xp')) return 1;
       return 0;
     }).array();
 

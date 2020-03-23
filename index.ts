@@ -77,11 +77,11 @@ class JanetClient extends Client {
 config.permissionLevels = new PermissionLevels()
 // everyone can use these commands
 .add(0, () => true)
-.add(1, ({ guild, member }) => (guild && guild.settings.roles.memberplus) && member.roles.cache.has(guild.settings.roles.memberplus))
-.add(2, ({ guild, member }) => (guild && guild.settings.roles.memberpro) && member.roles.cache.has(guild.settings.roles.memberpro))
-.add(3, ({ guild, member }) => (guild && guild.settings.roles.memberedition) && member.roles.cache.has(guild.settings.roles.memberedition))
-.add(4, ({ guild, member }) => (guild && guild.settings.roles.genius) && member.roles.cache.has(guild.settings.roles.genius))
-.add(5, ({ guild, member }) => (guild && guild.settings.roles.moderator) && member.roles.cache.has(guild.settings.roles.moderator))
+.add(1, ({ guild, member }) => (guild && guild.settings.get('roles.memberplus')) && member.roles.cache.has(guild.settings.get('roles.memberplus')))
+.add(2, ({ guild, member }) => (guild && guild.settings.get('roles.memberpro')) && member.roles.cache.has(guild.settings.get('roles.memberpro')))
+.add(3, ({ guild, member }) => (guild && guild.settings.get('roles.memberedition')) && member.roles.cache.has(guild.settings.get('roles.memberedition')))
+.add(4, ({ guild, member }) => (guild && guild.settings.get('roles.genius')) && member.roles.cache.has(guild.settings.get('roles.genius')))
+.add(5, ({ guild, member }) => (guild && guild.settings.get('roles.moderator')) && member.roles.cache.has(guild.settings.get('roles.moderator')))
 // Members of guilds must have 'MANAGE_GUILD' permission
 .add(6, ({ guild, member }) => guild && member.permissions.has('MANAGE_GUILD'), { fetch: true })
 // The member using this command must be the guild owner
