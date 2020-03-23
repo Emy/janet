@@ -44,13 +44,24 @@ module.exports = class extends Command {
       .setColor('GREEN')
       .setThumbnail(user.avatarURL({ format: 'jpg' }))
       .addField('Member', `${user.tag} (<@${user.id}>)`)
-      .addField('Level', user.settings.get('level'), true)
-      .addField('XP', user.settings.get('xp'), true)
+      .addField('Level', user.settings.level, true)
+      .addField('XP', `${user.settings.xp}/${this.getRemainingXPForNextLevel(user.settings.level+1)}`, true)
       .addField('Rank', `${rank} / ${leaderboard.length}`, true)
       .setFooter(user.id)
       .setTimestamp();
     msg.send(embed);
+    msg.delete();
   }
+
+  getRemainingXPForNextLevel(levelToReach){
+    let level = 0
+    let xp = 0;
+    for (let e = 0;e<levelToReach;e++){
+        xp = xp + 45 * level * (Math.floor(parseInt(level) / 10) + 1)
+        level++
+    }
+    return xp;
+}
 
   async init() {}
 
