@@ -1,8 +1,10 @@
-const { Command } = require('klasa');
+import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
 
-module.exports = class extends Command {
-  constructor(...args) {
-    super(...args, {
+import FilteredWord from '../../util/filteredWord';
+
+export default class extends Command {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text', 'dm', 'group'],
       requiredPermissions: [],
@@ -26,13 +28,14 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [prio]) {
+  async run(msg: KlasaMessage, [prio] : [number]) {
     let content = 'Filterwords: '
-    msg.guild.settings.filter.words.forEach((fw) => {
+    msg.guild.settings.filter.words.forEach((fw: FilteredWord) => {
       if (prio === undefined) content = content + `${fw.word} (${fw.priority}), `;
       if (prio === fw.priority) content = content + `${fw.word} (${fw.priority}), `;
     });
-    msg.send(content);
+
+    return msg.send(content);
   }
 
   async init() {}

@@ -1,9 +1,9 @@
-const { Command } = require('klasa');
+import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: false,
       runIn: ['text'],
       requiredPermissions: [],
@@ -27,11 +27,11 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [...params]) {
+  async run(msg: KlasaMessage, [...params]) {
     const everyone = msg.guild.roles.cache.first();
     const isLocked = msg.channel.permissionsFor(everyone).has('SEND_MESSAGES');
     await msg.channel.updateOverwrite(everyone, {SEND_MESSAGES: !isLocked});
-    msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`)
+    return msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`)
   }
 
   async init() {}

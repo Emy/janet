@@ -1,11 +1,12 @@
-const { Command } = require('klasa');
-const { MessageEmbed } = require('discord.js');
-const Case = require('../../util/case');
+import { MessageEmbed } from 'discord.js';
+import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+import Case from '../../util/case';
 
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: ['BAN_MEMBERS'],
@@ -32,7 +33,7 @@ module.exports = class extends Command {
 
   async init() {}
 
-  async buildCase(msg, reason, user) {
+  async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'UNBAN',
@@ -49,7 +50,7 @@ module.exports = class extends Command {
     return c;
   }
 
-  sendEmbed(msg, user, reason, c) {
+  sendEmbed(msg: KlasaMessage, user: KlasaUser, reason: string, c: Case) {
     const channelID = msg.guild.settings.channels.public;
     if (!channelID) return 'logchannel';
     const embed = new MessageEmbed()

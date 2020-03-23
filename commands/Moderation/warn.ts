@@ -1,11 +1,12 @@
-const { Command } = require('klasa');
-const { MessageEmbed } = require('discord.js');
-const Case = require('../../util/case');
+import { MessageEmbed } from 'discord.js';
+import { Command, KlasaMessage, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+import Case from '../../util/case';
 
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       runIn: ['text'],
       requiredPermissions: [],
       requiredSettings: [],
@@ -20,7 +21,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [member, points, reason]) {
+  async run(msg: KlasaMessage, [member, points, reason] : [KlasaUser, number, string]) {
     if (points <= 0) return msg.send('🤔');
     let warnPoints = member.user.settings.warnPoints;
     if (member.roles.highest.position >= msg.member.roles.highest.position) return msg.send('Your highest role is even or lower than the target users role.');
@@ -44,7 +45,7 @@ module.exports = class extends Command {
 
   async init() {}
 
-  async buildCase(msg, reason, points, user) {
+  async buildCase(msg: KlasaMessage, reason: string, points: number, user: KlasaUser) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'WARN',
@@ -61,7 +62,7 @@ module.exports = class extends Command {
     return c;
   }
 
-  sendWarnEmbed(msg, member, points, reason = 'No reason.', c) {
+  sendWarnEmbed(msg: KlasaMessage, member: KlasaUser, points: number, reason = 'No reason.', c: Case) {
     const channelID = msg.guild.settings.channels.public;
     if (!channelID) return;
     const embed = new MessageEmbed()
@@ -77,7 +78,7 @@ module.exports = class extends Command {
       this.client.channels.cache.get(channelID).send(embed);
   }
 
-  async sendKickEmbed(msg, member, points) {
+  async sendKickEmbed(msg: KlasaMessage, member: KlasaUser, points: number) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'KICK',
@@ -105,7 +106,7 @@ module.exports = class extends Command {
       this.client.channels.cache.get(channelID).send(embed);
   }
 
-  async sendBanEmbed(msg, member, points) {
+  async sendBanEmbed(msg: KlasaMessage, member: KlasaUser, points: number) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'BAN',

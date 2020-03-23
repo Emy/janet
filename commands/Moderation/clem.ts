@@ -1,11 +1,12 @@
-const { Command } = require('klasa');
-const { MessageEmbed } = require('discord.js');
-const Case = require('../../util/case');
+import { MessageEmbed } from 'discord.js';
+import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+import Case from '../../util/case';
 
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: [],
@@ -27,20 +28,19 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [member, reason]) {
+  async run(msg: KlasaMessage, [member, reason] : [KlasaUser, string]) {
     await member.user.settings.update('clem', true);
     await member.user.settings.update('xpFrozen', true);
     const warnPointDiff = 599 - member.user.settings.warnPoints;
     await member.user.settings.update('warnPoints', 599);
     const c = await this.buildCase(msg, reason, member.user, warnPointDiff)
+    
     this.sendEmbed(msg, member, reason, c)
-
-
   }
 
   async init() {}
 
-  async buildCase(msg, reason, user, warnPointDiff) {
+  async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, warnPointDiff: string) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'CLEM',
@@ -52,12 +52,14 @@ module.exports = class extends Command {
       punishment: warnPointDiff,
       currentWarnPoints: user.settings.warnPoints
     });
+
     await this.client.settings.update('caseID', this.client.settings.caseID + 1);
     await user.settings.update('cases', c, { action: 'add' });
     return c;
   }
 
-  sendEmbed(msg, member, reason, c) {
+  // TODO: Maybe Member != KlasaUser
+  sendEmbed(msg: KlasaMessage, member: KlasaUser, reason: string, c: Case) {
     const channelID = msg.guild.settings.channels.private;
     if (!channelID) return;
     const embed = new MessageEmbed()

@@ -1,10 +1,11 @@
-const { Command } = require('klasa');
-const FilteredWord = require('../../util/filteredWord')
+import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
 
-module.exports = class extends Command {
+import FilteredWord from '../../util/filteredWord';
 
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: [],
@@ -28,13 +29,14 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [priority, word]) {
+  async run(msg: KlasaMessage, [priority, word] : [number, string]) {
     const fw = new FilteredWord({
       word: word,
       priority: priority
     });
     await msg.guild.settings.update('filter.words', fw, { action: 'add' });
-    msg.send(`Added ${word} with priority ${priority}.`);
+    
+    return msg.send(`Added ${word} with priority ${priority}.`);
   }
 
   async init() {}

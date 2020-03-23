@@ -1,12 +1,12 @@
-const { Command } = require('klasa');
-const { MessageEmbed } = require('discord.js');
-const moment = require('moment');
-const Case = require('../../util/case');
+import { Command, KlasaMessage, KlasaUser } from 'klasa';
+import { MessageEmbed } from 'discord.js';
+import moment from 'moment';
+import Case from '../../util/case';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: ['MANAGE_ROLES'],
@@ -20,7 +20,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [member, duration, reason]) {
+  async run(msg: KlasaMessage, [member, duration, reason] : [KlasaUser, number, string]) {
     if (member.id === this.client.user.id) return msg.send('I cannot mute myself.');
     if (member.id === msg.author.id) return msg.send('You cannot mute yourself.');
     if (member.roles.highest.position >= msg.member.roles.highest.position) return msg.send('Your highest role is even or lower than the target users role.');
@@ -46,7 +46,7 @@ module.exports = class extends Command {
 
   async init() {}
 
-  async buildCase(msg, reason, user, duration) {
+  async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, duration: number) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'MUTE',
@@ -63,7 +63,7 @@ module.exports = class extends Command {
     return c;
   }
 
-  sendEmbed(msg, member, reason, duration, c) {
+  sendEmbed(msg: KlasaMessage, member: KlasaUser, reason: string, duration: number, c: Case) {
     const channelID = msg.guild.settings.channels.public;
     if (!channelID) return 'logchannel';
     const embed = new MessageEmbed()

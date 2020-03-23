@@ -1,9 +1,9 @@
-const { Command } = require('klasa');
+import { Command, CommandStore, KlasaClient, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: [],
@@ -27,9 +27,9 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [bool]) {
+  async run(msg: KlasaUser, [bool] : [boolean]) {
     msg.author.settings.update('offlineReportPing', bool);
-    msg.send(`Offline ping set to: ${bool}`);
+    return msg.send(`Offline ping set to: ${bool}`);
   }
 
   async init() {}

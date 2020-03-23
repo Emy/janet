@@ -1,9 +1,11 @@
-const { Command } = require('klasa');
+import { Command, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+import Case from '../../util/case';
 
-  constructor(...args) {
-    super(...args, {
+export default class extends Command {
+
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: false,
       runIn: ['text'],
       requiredPermissions: [],
@@ -27,7 +29,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [member, points, reason]) {
+  async run(msg: KlasaClient, [member, points, reason] : [KlasaUser, number, string]) {
     if (member.user.settings.warnPoints < points) points = member.user.settings.warnPoints;
     await member.user.settings.update('warnPoints', points * -1);
     const c = this.buildCase(msg, reason, points, member.user);
@@ -35,7 +37,7 @@ module.exports = class extends Command {
 
   async init() {}
 
-  async buildCase(msg, reason, points, user) {
+  async buildCase(msg: KlasaMessage, reason: string, points: number, user: KlasaUser) {
     const c = new Case({
       id: this.client.settings.caseID,
       type: 'LIFTWARN',

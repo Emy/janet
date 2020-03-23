@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2019 dirigeants. All rights reserved. MIT license.
-const { Command } = require('klasa');
+import { Command, KlasaClient, CommandStore, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       permissionLevel: 5,
       requiredPermissions: ['MANAGE_MESSAGES'],
       runIn: ['text'],
@@ -15,7 +15,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [limit, filter = null]) {
+  async run(msg: KlasaUser, [limit, filter = null]) {
     let messages = await msg.channel.messages.fetch({ limit: 100 });
     if (filter) {
       const user = typeof filter !== 'string' ? filter : null;
@@ -27,7 +27,7 @@ module.exports = class extends Command {
     return msg.sendMessage(`Successfully deleted ${messages.length} messages from ${limit}.`);
   }
 
-  getFilter(msg, filter, user) {
+  getFilter(msg: KlasaUser, filter: string, user: KlasaUser) {
     switch (filter) {
       case 'link': return mes => /https?:\/\/[^ /.]+\.[^ /.]+/.test(mes.content);
       case 'invite': return mes => /(https?:\/\/)?(www\.)?(discord\.(gg|li|me|io)|discordapp\.com\/invite)\/.+/.test(mes.content);
