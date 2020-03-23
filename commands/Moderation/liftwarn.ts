@@ -1,4 +1,5 @@
-import { Command, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
+import { GuildMember } from 'discord.js';
+import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
 import Case from '../../util/case';
 
@@ -29,8 +30,8 @@ export default class extends Command {
     });
   }
 
-  async run(msg: KlasaClient, [member, points, reason] : [KlasaUser, number, string]) {
-    if (member.user.settings.warnPoints < points) points = member.user.settings.warnPoints;
+  async run(msg: KlasaMessage, [member, points, reason] : [GuildMember, number, string]) {
+    if (member.user.settings.get('warnPoints') < points) points = member.user.settings.get('warnPoints');
     await member.user.settings.update('warnPoints', points * -1);
     const c = this.buildCase(msg, reason, points, member.user);
   }
@@ -39,7 +40,7 @@ export default class extends Command {
 
   async buildCase(msg: KlasaMessage, reason: string, points: number, user: KlasaUser) {
     const c = new Case({
-      id: this.client.settings.caseID,
+      id: this.client.settings.get('caseID'),
       type: 'LIFTWARN',
       date: Date.now(),
       until: undefined,
@@ -47,9 +48,9 @@ export default class extends Command {
       modTag: msg.author.tag,
       reason: reason,
       punishment: points,
-      currentWarnPoints: user.settings.warnPoints
+      currentWarnPoints: user.settings.get('warnPoints')
     });
-    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
     await user.settings.update('cases', c, { action: 'add' });
     return c;
   }

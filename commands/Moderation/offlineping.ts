@@ -1,4 +1,4 @@
-import { Command, CommandStore, KlasaClient, KlasaUser } from 'klasa';
+import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
 
 export default class extends Command {
 
@@ -27,7 +27,7 @@ export default class extends Command {
     });
   }
 
-  async run(msg: KlasaUser, [bool] : [boolean]) {
+  async run(msg: KlasaMessage, [bool] : [boolean]) {
     msg.author.settings.update('offlineReportPing', bool);
     return msg.send(`Offline ping set to: ${bool}`);
   }

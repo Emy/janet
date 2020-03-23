@@ -1,3 +1,4 @@
+import { TextChannel } from 'discord.js';
 import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
 
 export default class extends Command {
@@ -29,8 +30,9 @@ export default class extends Command {
 
   async run(msg: KlasaMessage, [...params]) {
     const everyone = msg.guild.roles.cache.first();
-    const isLocked = msg.channel.permissionsFor(everyone).has('SEND_MESSAGES');
-    await msg.channel.updateOverwrite(everyone, {SEND_MESSAGES: !isLocked});
+    const channel = msg.channel as TextChannel
+    const isLocked = channel.permissionsFor(everyone).has('SEND_MESSAGES');
+    await channel.updateOverwrite(everyone, {SEND_MESSAGES: !isLocked});
     return msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`)
   }
 

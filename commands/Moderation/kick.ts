@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
 import Case from '../../util/case';
@@ -33,7 +33,7 @@ export default class extends Command {
 
   async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser) {
     const c = new Case({
-      id: this.client.settings.caseID,
+      id: this.client.settings.get('caseID'),
       type: 'KICK',
       date: Date.now(),
       until: undefined,
@@ -41,16 +41,15 @@ export default class extends Command {
       modTag: msg.author.tag,
       reason: reason,
       punishment: undefined,
-      currentWarnPoints: user.settings.warnPoints
+      currentWarnPoints: user.settings.get('warnPoints')
     });
-    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
     await user.settings.update('cases', c, { action: 'add' });
     return c;
   }
 
-  // TODO: Maybe Member != KlasaUser
-  sendEmbed(msg: KlasaMessage, member: KlasaUser, reason: string, c: Case) {
-    const channelID = msg.guild.settings.channels.public;
+  sendEmbed(msg: KlasaMessage, member: GuildMember, reason: string, c: Case) {
+    const channelID = msg.guild.settings.get('channels.public');
     if (!channelID) return 'logchannel';
     const embed = new MessageEmbed()
       .setTitle('Member Kicked')
@@ -61,6 +60,8 @@ export default class extends Command {
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
-    this.client.channels.cache.get(channelID).send(embed);
+
+    const channel = this.client.channels.cache.get(channelID) as TextChannel
+    channel.send(embed);
   }
 };

@@ -30,7 +30,7 @@ export default class extends Command {
 
   async run(msg: KlasaMessage, [prio] : [number]) {
     let content = 'Filterwords: '
-    msg.guild.settings.filter.words.forEach((fw: FilteredWord) => {
+    msg.guild.settings.get('filter.words').forEach((fw: FilteredWord) => {
       if (prio === undefined) content = content + `${fw.word} (${fw.priority}), `;
       if (prio === fw.priority) content = content + `${fw.word} (${fw.priority}), `;
     });

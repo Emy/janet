@@ -1,6 +1,7 @@
 import { MessageEmbed } from 'discord.js';
-import { Command, CommandStore, KlasaClient, RichDisplay, KlasaMessage, KlasaUser } from 'klasa';
+import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser, RichDisplay } from 'klasa';
 import moment from 'moment';
+
 import Case from '../../util/case';
 
 export default class extends Command {
@@ -35,7 +36,7 @@ export default class extends Command {
     let counter = 0;
     let embed = new MessageEmbed();
     await user.settings.sync();
-    user.settings.cases.forEach((c: Case) => {
+    user.settings.get('cases').forEach((c: Case) => {
       embed.addField(
         `#${c.id} ${c.type} - Mod: ${c.modTag} Reason: ${c.reason} Punishment: ${c.punishment}`,
         `At: ${moment(new Date(c.date).toISOString()).format('LL')}`);
@@ -47,7 +48,7 @@ export default class extends Command {
     });
     if (counter % 10 !== 0) display.addPage(embed);
 
-    display.run(msg)
+    return display.run(msg)
   }
 
   async init() {}

@@ -1,6 +1,7 @@
+import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import { Command, KlasaMessage, KlasaUser } from 'klasa';
-import { MessageEmbed } from 'discord.js';
 import moment from 'moment';
+
 import Case from '../../util/case';
 
 export default class extends Command {
@@ -20,13 +21,13 @@ export default class extends Command {
     });
   }
 
-  async run(msg: KlasaMessage, [member, duration, reason] : [KlasaUser, number, string]) {
+  async run(msg: KlasaMessage, [member, duration, reason] : [GuildMember, Date, string]) {
     if (member.id === this.client.user.id) return msg.send('I cannot mute myself.');
     if (member.id === msg.author.id) return msg.send('You cannot mute yourself.');
     if (member.roles.highest.position >= msg.member.roles.highest.position) return msg.send('Your highest role is even or lower than the target users role.');
-    if (member.roles.cache.has(msg.guild.settings.roles.muted)) return msg.send('Target is already muted.');
+    if (member.roles.cache.has(msg.guild.settings.get('roles.muted'))) return msg.send('Target is already muted.');
 
-    await member.roles.add(msg.guild.settings.roles.muted);
+    await member.roles.add(msg.guild.settings.get('roles.muted'));
     await member.user.settings.update('isMuted', true);
 
     const c = await this.buildCase(msg, reason, member.user, duration);
@@ -46,9 +47,9 @@ export default class extends Command {
 
   async init() {}
 
-  async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, duration: number) {
+  async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, duration: Date) {
     const c = new Case({
-      id: this.client.settings.caseID,
+      id: this.client.settings.get('caseID'),
       type: 'MUTE',
       date: Date.now(),
       until: duration,
@@ -56,15 +57,15 @@ export default class extends Command {
       modTag: msg.author.tag,
       reason: reason,
       punishment: duration ? moment().to(duration.toISOString(), true) : 'PERMANENT',
-      currentWarnPoints: user.settings.warnPoints
+      currentWarnPoints: user.settings.get('warnPoints')
     });
-    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
     await user.settings.update('cases', c, { action: 'add' });
     return c;
   }
 
-  sendEmbed(msg: KlasaMessage, member: KlasaUser, reason: string, duration: number, c: Case) {
-    const channelID = msg.guild.settings.channels.public;
+  sendEmbed(msg: KlasaMessage, member: GuildMember, reason: string, duration: Date, c: Case) {
+    const channelID = msg.guild.settings.get('channels.public');
     if (!channelID) return 'logchannel';
     const embed = new MessageEmbed()
       .setTitle('Member Muted')
@@ -76,7 +77,9 @@ export default class extends Command {
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${member.id}`)
       .setTimestamp();
-    return this.client.channels.cache.get(channelID).send(embed);
+
+    const channel = this.client.channels.cache.get(channelID) as TextChannel
+    return channel.send(embed);
   }
 
 };

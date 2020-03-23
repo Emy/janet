@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, TextChannel } from 'discord.js';
 import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
 import Case from '../../util/case';
@@ -20,11 +20,11 @@ export default class extends Command {
     });
   }
 
-  async run(msg, [user, reason]) {
+  async run(msg: KlasaMessage, [user, reason] : [KlasaUser, string]) {
     const bannedPlayers = await msg.guild.fetchBans();
     if (!bannedPlayers.has(user.id)) return msg.send('Target is not banned.');
     await msg.guild.members.unban(user, reason);
-    if (user.settings.warnPoints >= 600) user.settings.update('warnPoints', 450);
+    if (user.settings.get('warnPoints') >= 600) user.settings.update('warnPoints', 450);
 
     const c = await this.buildCase(msg, reason, user);
 
@@ -35,7 +35,7 @@ export default class extends Command {
 
   async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser) {
     const c = new Case({
-      id: this.client.settings.caseID,
+      id: this.client.settings.get('caseID'),
       type: 'UNBAN',
       date: Date.now(),
       until: undefined,
@@ -43,15 +43,15 @@ export default class extends Command {
       modTag: msg.author.tag,
       reason: reason,
       punishment: undefined,
-      currentWarnPoints: user.settings.warnPoints
+      currentWarnPoints: user.settings.get('warnPoints')
     });
-    await this.client.settings.update('caseID', this.client.settings.caseID + 1);
+    await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
     await user.settings.update('cases', c, { action: 'add' });
     return c;
   }
 
   sendEmbed(msg: KlasaMessage, user: KlasaUser, reason: string, c: Case) {
-    const channelID = msg.guild.settings.channels.public;
+    const channelID = msg.guild.settings.get('channels.public');
     if (!channelID) return 'logchannel';
     const embed = new MessageEmbed()
       .setTitle('Member Unbanned')
@@ -62,6 +62,8 @@ export default class extends Command {
       .addField('Reason', reason ? reason : 'No reason.')
       .setFooter(`Case #${c.id} | ${user.id}`)
       .setTimestamp();
-      this.client.channels.cache.get(channelID).send(embed);
+
+    const channel = this.client.channels.cache.get(channelID) as TextChannel
+    channel.send(embed);
   }
 };
