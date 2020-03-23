@@ -1,5 +1,6 @@
 const { Event } = require('klasa');
 const { MessageEmbed } = require('discord.js');
+const ASCIIFolder = require('fold-to-ascii');
 
 module.exports = class extends Event {
 
@@ -16,10 +17,11 @@ module.exports = class extends Event {
       const channelID = oldMember.guild.settings.channels.private;
       if (!channelID) return;
 
+      const nick = ASCIIFolder.foldMaintaining(newMember.displayName).toLowerCase();
+
       if (oldMember.guild.settings.filter.enableWordFiltering) {
         for (let filteredWord of oldMember.guild.settings.filter.words) {
-          if (!newMember.nickname) continue;
-          if (!newMember.nickname.toLowerCase().includes(filteredWord.word.toLowerCase())) continue;
+          if (!nick.includes(filteredWord.word.toLowerCase())) continue;
           newMember.setNickname('change name pls', 'filtered word');
         }
       }
