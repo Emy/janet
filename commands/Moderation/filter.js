@@ -35,6 +35,7 @@ module.exports = class extends Command {
     });
     await msg.guild.settings.update('filter.words', fw, { action: 'add' });
     msg.send(`Added ${word} with priority ${priority}.`);
+    msg.delete();
   }
 
   async init() {}

@@ -40,6 +40,7 @@ module.exports = class extends Command {
       await member.user.settings.update('warnKicked', true);
       await this.sendKickEmbed(msg, member, points);
     }
+    msg.delete();
   }
 
   async init() {}

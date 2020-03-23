@@ -32,6 +32,7 @@ module.exports = class extends Command {
     const isLocked = msg.channel.permissionsFor(everyone).has('SEND_MESSAGES');
     await msg.channel.updateOverwrite(everyone, {SEND_MESSAGES: !isLocked});
     msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`)
+    msg.delete();
   }
 
   async init() {}

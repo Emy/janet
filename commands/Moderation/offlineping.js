@@ -30,6 +30,7 @@ module.exports = class extends Command {
   async run(msg, [bool]) {
     msg.author.settings.update('offlineReportPing', bool);
     msg.send(`Offline ping set to: ${bool}`);
+    msg.delete();
   }
 
   async init() {}

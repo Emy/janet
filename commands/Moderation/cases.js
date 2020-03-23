@@ -47,6 +47,7 @@ module.exports = class extends Command {
     if (counter % 10 !== 0) display.addPage(embed);
 
     display.run(msg);
+    msg.delete();
   }
 
   async init() {}

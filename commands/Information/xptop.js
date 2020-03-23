@@ -37,6 +37,7 @@ module.exports = class extends Command {
       embed.addField(`#${counter++} - Level ${user.settings.level}`, `<@${user.id}>`)
     });
     msg.send(embed);
+    msg.delete();
   }
 
   async init() {}

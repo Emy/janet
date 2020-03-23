@@ -28,6 +28,7 @@ module.exports = class extends Command {
       .setFooter(user.id)
       .setTimestamp();
     msg.send(embed);
+    msg.delete();
   }
 
   async init() {}

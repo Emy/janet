@@ -33,6 +33,7 @@ module.exports = class extends Command {
       if (prio === fw.priority) content = content + `${fw.word} (${fw.priority}), `;
     });
     msg.send(content);
+    msg.delete();
   }
 
   async init() {}

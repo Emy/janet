@@ -26,6 +26,7 @@ module.exports = class extends Command {
     await member.kick(reason);
     const c = await this.buildCase(msg, reason, member.user);
     this.sendEmbed(msg, member, reason, c);
+    msg.delete();
   }
 
   async init() {}
