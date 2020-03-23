@@ -1,8 +1,9 @@
+import { Client, PermissionLevels, KlasaClientOptions } from "klasa";
+import { config, token } from "./config"
+
 require('dotenv').config()
 
-const { Client, PermissionLevels } = require('klasa');
 // const { Shoukaku } = require('shoukaku');
-const { config, token } = require('./config');
 // const Queue = require('./util/queue');
 
 // const shoukakuConfig = {
@@ -23,8 +24,8 @@ const { config, token } = require('./config');
 
 class JanetClient extends Client {
 
-  constructor(...args) {
-    super(...args);
+  constructor(options: KlasaClientOptions) {
+    super(options);
     Client.defaultClientSchema
       .add('caseID', 'integer', { default: 0, min: 0, configurable: false })
     Client.defaultGuildSchema

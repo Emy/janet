@@ -1,10 +1,12 @@
+import { KlasaClientOptions } from "klasa";
+
 /**
  * The following are all client options for Klasa/Discord.js.
  * Any option that you wish to use the default value can be removed from this file.
  * This file is init with defaults from both Klasa and Discord.js.
  */
 
-exports.config = {
+export const config: KlasaClientOptions = {
   /**
    * General Options
    */
@@ -146,4 +148,4 @@ exports.config = {
     clientStorage: {}
   },
 };
-exports.token = process.env.DISCORD_TOKEN;
+export const token = process.env.DISCORD_TOKEN;
