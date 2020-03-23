@@ -1,5 +1,6 @@
 const { Monitor } = require('klasa');
 const { MessageEmbed } = require('discord.js');
+const ASCIIFolder = require('fold-to-ascii');
 
 module.exports = class extends Monitor {
 
@@ -16,10 +17,13 @@ module.exports = class extends Monitor {
 
   async run(msg) {
     if (!msg.guild.settings.filter.enableWordFiltering) return;
+
+    const content = ASCIIFolder.foldMaintaining(msg.content).toLowerCase();
+
     const filteredWords = [];
     let highestPrio = -1;
     msg.guild.settings.filter.words.forEach((filterWord) => {
-      if (!(msg.content.toLowerCase().indexOf(filterWord.word.toLowerCase()) > -1)) return;
+      if (!(content.indexOf(filterWord.word.toLowerCase()) > -1)) return;
       filteredWords.push(filterWord.word);
       if (!(highestPrio < filterWord.priority)) return;
       highestPrio = filterWord.priority;
