@@ -1,17 +1,17 @@
-const { Command, version: klasaVersion, Duration } = require('klasa');
-const { version: discordVersion } = require('discord.js');
+import { version as discordVersion } from 'discord.js';
+import { Command, CommandStore, Duration, KlasaClient, KlasaMessage, version as klasaVersion } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-	constructor(...args) {
-		super(...args, {
+	constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+		super(client, store, file, dir, {
 			enabled: false,
 			guarded: true,
 			description: language => language.get('COMMAND_STATS_DESCRIPTION')
 		});
 	}
 
-	async run(message) {
+	async run(message: KlasaMessage) {
 		let [users, guilds, channels, memory] = [0, 0, 0, 0];
 
 		if (this.client.shard) {

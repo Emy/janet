@@ -1,10 +1,10 @@
-const { Command } = require('klasa');
-const { MessageEmbed } = require('discord.js');
+import { MessageEmbed } from 'discord.js';
+import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
@@ -18,7 +18,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [user]) {
+  async run(msg: KlasaMessage, [user]: [KlasaUser]) {
     if (!await msg.hasAtLeastPermissionLevel(5)) {
       if (!msg.guild.settings.channels.botspam) return;
       if(msg.channel.id != msg.guild.settings.channels.botspam) {
@@ -49,7 +49,8 @@ module.exports = class extends Command {
       .addField('Rank', `${rank} / ${leaderboard.length}`, true)
       .setFooter(user.id)
       .setTimestamp();
-    msg.send(embed);
+      
+    return msg.send(embed);
   }
 
   async init() {}

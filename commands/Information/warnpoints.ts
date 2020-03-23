@@ -1,10 +1,10 @@
-const { Command } = require('klasa');
-const { MessageEmbed } = require('discord.js');
+import { MessageEmbed } from 'discord.js';
+import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
@@ -17,8 +17,9 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [user]) {
+  async run(msg: KlasaMessage, [user]: [KlasaUser]) {
     if (!user) user = msg.author
+    
     const embed = new MessageEmbed()
       .setTitle('Warn Points')
       .setColor('ORANGE')
@@ -27,7 +28,8 @@ module.exports = class extends Command {
       .addField('Warn Points', user.settings.get('warnPoints'))
       .setFooter(user.id)
       .setTimestamp();
-    msg.send(embed);
+
+    return msg.send(embed)
   }
 
   async init() {}
