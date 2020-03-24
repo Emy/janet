@@ -1,12 +1,18 @@
-const Dispatcher = require('./dispatcher');
+import { Client, KlasaMessage } from 'klasa';
+import { ShoukakuSocket } from 'shoukaku';
 
-class Queue extends Map {
-  constructor(client) {
+import Dispatcher from './dispatcher';
+
+export default class Queue extends Map {
+
+  public client: Client;
+
+  constructor(client: Client) {
     super();
     this.client = client;
   }
 
-  async handleTrack(node, track, msg) {
+  async handleTrack(node: ShoukakuSocket, track: string, msg: KlasaMessage) {
     let dispatcher = this.get(msg.guild.id);
     if (!dispatcher) {
       const player = await node.joinVoiceChannel({
@@ -27,5 +33,3 @@ class Queue extends Map {
     return null;
   }
 }
-
-module.exports = Queue;
