@@ -42,6 +42,10 @@ module.exports = class extends Event {
       const channelID = oldMember.guild.settings.channels.private;
       if (!channelID) return;
       let newRole = newMember.roles.cache.difference(oldMember.roles.cache)
+
+      newRole.delete(newMember.guild.settings.roles.member);
+      if (newRole.size < 1) return;
+
       let embedTitle = (newMember.roles.cache.size > oldMember.roles.cache.size) ? 'Member Role Added' : 'Member Role Removed'
 
       const embed = new MessageEmbed()
