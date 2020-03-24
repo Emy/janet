@@ -25,7 +25,7 @@ module.exports = class extends Event {
     .addField('User', `${msg.author.tag} (<@${msg.author.id}>)`, true)
     .addField('Channel', `<#${msg.channel.id}>`, true)
     .addField('Message', msg.content)
-    .setFooter(msg.member.user.id)
+    .setFooter(msg.author.id)
     .setTimestamp();
     
     this.client.channels.cache.get(channelID).send(embed);
