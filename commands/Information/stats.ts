@@ -1,37 +1,43 @@
-import { version as discordVersion } from 'discord.js';
-import { Command, CommandStore, Duration, KlasaClient, KlasaMessage, version as klasaVersion } from 'klasa';
+import { MessageEmbed } from 'discord.js';
+import { Command, CommandStore, Duration, KlasaClient, KlasaMessage } from 'klasa';
 
 export default class extends Command {
 
 	constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
 		super(client, store, file, dir, {
-			enabled: false,
+			enabled: true,
 			guarded: true,
 			description: language => language.get('COMMAND_STATS_DESCRIPTION')
 		});
 	}
 
-	async run(message: KlasaMessage) {
-		let [users, guilds, channels, memory] = [0, 0, 0, 0];
+	async run(msg: KlasaMessage) {
+		if (!await msg.hasAtLeastPermissionLevel(5)) {
+      		if (!msg.guild.settings.get('channels.botspam')) return;
+      		if(msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+        		return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+      		}
+    	}
+		let [users, memory] = [0, 0];
 
 		if (this.client.shard) {
-			const results = await this.client.shard.broadcastEval(`[this.users.cache.size, this.guilds.cache.size, this.channels.cache.size, (process.memoryUsage().heapUsed / 1024 / 1024)]`);
+			const results = await this.client.shard.broadcastEval(`[this.users.cache.size, (process.memoryUsage().heapUsed / 1024 / 1024)]`);
 			for (const result of results) {
 				users += result[0];
-				guilds += result[1];
-				channels += result[2];
 				memory += result[3];
 			}
 		}
 
-		return message.sendCode('asciidoc', message.language.get('COMMAND_STATS',
-			(memory || process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2),
-			Duration.toNow(Date.now() - (process.uptime() * 1000)),
-			(users || this.client.users.cache.size).toLocaleString(),
-			(guilds || this.client.guilds.cache.size).toLocaleString(),
-			(channels || this.client.channels.cache.size).toLocaleString(),
-			klasaVersion, discordVersion, process.version, message
-		));
+		const embed = new MessageEmbed()
+			.setTitle('Statistics')
+			.setThumbnail(this.client.user.avatarURL({ format: 'jpg' }))
+			.setColor('GREEN')
+			.addField('Users', users || this.client.users.cache.size, true)
+			.addField('Memory', `${(memory || process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`, true)
+			.addField('Uptime', Duration.toNow(Date.now() - (process.uptime() * 1000)), true)
+			.setTimestamp()
+		msg.send(embed);
+		msg.delete();
 	}
 
 };

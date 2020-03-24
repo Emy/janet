@@ -45,13 +45,26 @@ export default class extends Command {
       .setThumbnail(user.avatarURL({ format: 'jpg' }))
       .addField('Member', `${user.tag} (<@${user.id}>)`)
       .addField('Level', user.settings.get('level'), true)
-      .addField('XP', user.settings.get('xp'), true)
+      .addField('XP', `${user.settings.get('xp')}/${this.getRemainingXPForNextLevel(user.settings.get('level') + 1)}`, true)
       .addField('Rank', `${rank} / ${leaderboard.length}`, true)
       .setFooter(user.id)
       .setTimestamp();
-      
-    return msg.send(embed);
+
+      msg.delete();
+      return msg.send(embed);
   }
+
+  getRemainingXPForNextLevel(levelToReach: number){
+    let level = 0
+    let xp = 0;
+    
+    for (let e = 0; e < levelToReach; e++){
+        xp = xp + 45 * level * (Math.floor(level / 10) + 1)
+        level++
+    }
+    
+    return xp;
+}
 
   async init() {}
 

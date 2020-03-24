@@ -12,17 +12,22 @@ export default class extends Event {
   }
 
   async run(member: GuildMember) {
-    let channelID = member.guild.settings.get('channels.private')
-    if (!channelID) return;
-
-    const nick = ASCIIFolder.foldMaintaining(member.displayName).toLowerCase();
-
     if (member.guild.settings.get('filter.enableWordFiltering')) {
+
+      const nick = ASCIIFolder.foldMaintaining(member.displayName).toLowerCase();
+
       for (let filteredWord of member.guild.settings.get('filter.words')) {
         if (!nick.includes(filteredWord.word.toLowerCase())) continue;
         member.setNickname('change name pls', 'filtered word');
       }
     }
+
+    if (member.guild.settings.get('roles.member')) {
+      member.roles.add(member.guild.settings.get('roles.member'));
+    }
+
+    let channelID = member.guild.settings.get('channels.private')
+    if (!channelID) return;
 
     const embed = new MessageEmbed()
     .setTitle('Member Joined')
@@ -34,7 +39,6 @@ export default class extends Event {
     .addField('Created', member.user.createdAt)
     .setTimestamp()
     .setFooter(member.user.id);
-
     let channel = this.client.channels.cache.get(channelID) as TextChannel
     channel.send(embed);
     

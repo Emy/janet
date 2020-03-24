@@ -37,6 +37,7 @@ export default class extends Command {
       embed.addField(`#${counter++} - Level ${user.settings.get('level')}`, `<@${user.id}>`)
     });
 
+    msg.delete();
     return msg.send(embed);
   }
 

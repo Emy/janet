@@ -39,6 +39,27 @@ export default class extends Event {
         const channel = this.client.channels.cache.get(channelID) as TextChannel
         channel.send(embed);
     }
+
+    if (newMember.roles.cache.size != oldMember.roles.cache.size) {
+      const channelID = oldMember.guild.settings.get('channels.private');
+      if (!channelID) return;
+      let newRole = newMember.roles.cache.difference(oldMember.roles.cache)
+
+      newRole.delete(newMember.guild.settings.get('roles.member'));
+      if (newRole.size < 1) return;
+
+      let embedTitle = (newMember.roles.cache.size > oldMember.roles.cache.size) ? 'Member Role Added' : 'Member Role Removed'
+
+      const embed = new MessageEmbed()
+          .setTitle(embedTitle)
+          .setThumbnail(oldMember.user.avatarURL({ format: 'jpg' }))
+          .setColor('BLUE')
+          .addField('Member', `${oldMember.user.tag} (<@${oldMember.id}>)`)
+          .addField('Role', `${newRole.map(role => role.name)}`, true)
+          .setFooter(oldMember.user.id)
+          .setTimestamp();
+      this.client.channels.cache.get(channelID).send(embed);
+      }
   }
 
   async init() {}

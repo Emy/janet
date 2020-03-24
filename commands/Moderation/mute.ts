@@ -42,7 +42,8 @@ export default class extends Command {
       });
     }
 
-    this.sendEmbed(msg, member, reason, duration, c)
+    this.sendEmbed(msg, member, reason, duration, c);
+    msg.delete();
   }
 
   async init() {}

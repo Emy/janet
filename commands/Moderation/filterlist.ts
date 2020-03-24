@@ -6,7 +6,7 @@ export default class extends Command {
   constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
     super(client, store, file, dir, {
       enabled: true,
-      runIn: ['text', 'dm', 'group'],
+      runIn: ['text', 'dm'],
       requiredPermissions: [],
       requiredSettings: [],
       aliases: [],
@@ -35,6 +35,7 @@ export default class extends Command {
       if (prio === fw.priority) content = content + `${fw.word} (${fw.priority}), `;
     });
 
+    msg.delete();
     return msg.send(content);
   }
 

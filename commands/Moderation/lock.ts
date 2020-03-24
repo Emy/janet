@@ -32,7 +32,10 @@ export default class extends Command {
     const everyone = msg.guild.roles.cache.first();
     const channel = msg.channel as TextChannel
     const isLocked = channel.permissionsFor(everyone).has('SEND_MESSAGES');
+
     await channel.updateOverwrite(everyone, {SEND_MESSAGES: !isLocked});
+    
+    msg.delete();
     return msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`)
   }
 

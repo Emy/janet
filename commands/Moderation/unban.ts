@@ -29,6 +29,7 @@ export default class extends Command {
     const c = await this.buildCase(msg, reason, user);
 
     this.sendEmbed(msg, user, reason, c);
+    msg.delete();
   }
 
   async init() {}
