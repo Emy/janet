@@ -29,6 +29,9 @@ module.exports = class extends Command {
 
     const timestamp = new Timestamp('LLL')
 
+    const joined = timestamp.display(member.joinedAt);
+    const created = timestamp.display(member.user.createdAt);
+
     const embed = new MessageEmbed()
       .setTitle('User Information')
       .setColor(member.roles.highest.color)
@@ -36,9 +39,9 @@ module.exports = class extends Command {
       .addField('Username', `${member.user.tag} (${member.user})`, true)
       .addField('Level', member.user.settings.level, true)
       .addField('XP', member.user.settings.xp, true)
-      .addField('Roles', roles)
-      .addField('Joined', timestamp.display(member.joinedAt), true)
-      .addField('Created', timestamp.display(member.user.createdAt), true)
+      .addField('Roles', roles ? roles : 'No roles.')
+      .addField('Joined', joined ? joined : 'N/A', true)
+      .addField('Created', created ? created : 'N/A', true)
       .setFooter(member.user.id)
       .setTimestamp();
     msg.send(embed);
