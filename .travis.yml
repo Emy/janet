@@ -6,5 +6,9 @@ node_js:
 cache:
     directories:
         - node_modules
+jobs:
+    include:
+      - stage: "ESLint"
+        script: yarn eslint
 script:
     - yarn build
