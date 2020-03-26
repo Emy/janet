@@ -10,6 +10,7 @@
     "build": "tsc -b src",
     "start": "node dist/index.js",
     "eslint": "eslint .",
+    "eslint:fix": "eslint . --fix",
     "jest": "echo eta son"
   },
   "dependencies": {
