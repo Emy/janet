@@ -1,6 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser, RichDisplay } from 'klasa';
-import moment from 'moment';
+
+var moment = require('moment');
 
 import Case from '../../util/case';
 
