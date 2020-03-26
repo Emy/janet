@@ -17,6 +17,8 @@ export default class extends Monitor {
         const regex = new RegExp(/\|{2}(.*)\|{2}/);
         const matches = regex.exec(msg.content);
         if (!matches) return;
-        msg.delete();
+        const roleID = msg.guild.settings.get('roles.moderator');
+        if (roleID && msg.guild.roles.cache.get(roleID).position <= msg.member.roles.highest.position) return;
+        return msg.delete();
     }
 }
