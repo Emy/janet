@@ -16,13 +16,11 @@
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
     "fold-to-ascii": "^5.0.0",
-    "fs-nextra": "^0.4.7",
     "klasa": "dirigeants/klasa",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
     "pg": "^7.18.2",
-    "shoukaku": "Deivu/Shoukaku",
-    "sqlite": "^3.0.3"
+    "shoukaku": "Deivu/Shoukaku"
   },
   "devDependencies": {
     "@types/node": "^13.9.3",
