@@ -1,17 +1,17 @@
-const { Command, Timestamp } = require('klasa');
-const { MessageEmbed } = require('discord.js')
+import { MessageEmbed } from 'discord.js';
+import { Command, Timestamp, KlasaClient, CommandStore, KlasaMessage } from 'klasa';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: [],
     });
   }
 
-  async run(msg, [...params]) {
+  async run(msg: KlasaMessage, [...params]) {
     const timestamp = new Timestamp('LLL');
 
     const embed = new MessageEmbed()
@@ -30,9 +30,13 @@ module.exports = class extends Command {
       .setFooter(msg.guild.id)
       .setTimestamp();
 
-      msg.send(embed);
+    msg.send(embed);
+    msg.delete();
+    return null
   }
 
-  async init() {}
+  async init() { }
 
 };
+
+

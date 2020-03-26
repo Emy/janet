@@ -1,10 +1,10 @@
-const { Command, Timestamp } = require('klasa');
-const { MessageEmbed } = require('discord.js');
+import { Command, Timestamp, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { MessageEmbed, GuildMember } from 'discord.js';
 
-module.exports = class extends Command {
+export default class extends Command {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       runIn: ['text'],
       requiredPermissions: [],
@@ -15,11 +15,11 @@ module.exports = class extends Command {
     });
   }
 
-  async run(msg, [member]) {
+  async run(msg: KlasaMessage, [member] : [GuildMember]) {
     if (!await msg.hasAtLeastPermissionLevel(5)) {
-      if (!msg.guild.settings.channels.botspam) return;
-      if(msg.channel.id != msg.guild.settings.channels.botspam) {
-        return msg.send(`Command only allowed in <#${msg.guild.settings.channels.botspam}>`);
+      if (!msg.guild.settings.get('channels.botspam')) return;
+      if(msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+        return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
       }
     }
     if (!member) member = msg.member;
@@ -37,8 +37,8 @@ module.exports = class extends Command {
       .setColor(member.roles.highest.color)
       .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
       .addField('Username', `${member.user.tag} (${member.user})`, true)
-      .addField('Level', member.user.settings.level, true)
-      .addField('XP', member.user.settings.xp, true)
+      .addField('Level', member.user.settings.get('level'), true)
+      .addField('XP', member.user.settings.get('xp'), true)
       .addField('Roles', roles ? roles : 'No roles.')
       .addField('Joined', joined ? joined : 'N/A', true)
       .addField('Created', created ? created : 'N/A', true)
