@@ -19,7 +19,7 @@ export default class extends Event {
     .addField('User', `${member.user.tag} (<@${member.user.id}>)`)
     .setFooter(member.user.id)
 
-    const channel = this.client.channels.cache.get(member.guild.settings.get('channel.private')) as TextChannel
+    const channel = this.client.channels.cache.get(member.guild.settings.get('channels.private')) as TextChannel
     channel.send(embed);
   }
 

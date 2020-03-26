@@ -20,7 +20,7 @@ export default class extends Monitor {
     const regex = new RegExp(/\[\[(.*)\]\]/);
     const matches = regex.exec(msg.content);
     if (!matches || !matches[1]) return;
-    const response = await fetch(`https://tss-saver.cloud.tyk.io/repoapi/v1/repo?query=${encodeURIComponent(matches)}`)
+    const response = await fetch(`https://tss-saver.cloud.tyk.io/repoapi/v1/repo?query=${encodeURIComponent(String(matches))}`)
     const data = await response.json();
     if (!data.results.length) return msg.send('No Tweak found.');
     const tweak = data.results[0];
