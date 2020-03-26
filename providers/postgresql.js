@@ -1,42 +1,29 @@
 // Copyright (c) 2017-2019 dirigeants. All rights reserved. MIT license.
-import {
-    KlasaClient,
-    ProviderStore,
-    QueryBuilder,
-    SchemaPiece,
-    SettingsUpdateResultEntry,
-    SQLProvider,
-    Type,
-    util,
-} from 'klasa';
-import { Pool, PoolClient } from 'pg';
+const { SQLProvider, Type, QueryBuilder, util: { mergeDefault, isNumber } } = require('klasa');
+const { Pool } = require('pg');
 
-export default class extends SQLProvider {
+module.exports = class extends SQLProvider {
 
-	public qb: QueryBuilder = new QueryBuilder({
-		boolean: 'BOOL',
-		integer: { type: ({ max }: { max: number }) => max !== null && max >= 2 ** 32 ? 'BIGINT' : 'INTEGER' },
-		float: 'DOUBLE PRECISION',
-		uuid: `UUID`,
-		json: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
-		any: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
-		filteredword: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
-		case: { type: 'JSON', resolver: (input: any, schemaPiece: SchemaPiece) => `'${JSON.stringify(input)}'::json` },
-		array: { type: (type: SchemaPiece) => `${type}[]` },
-	}, {
-		arrayResolver: (values: Array<any>, piece: SchemaPiece, resolver: Function) => values.length ? `array[${values.map(value => resolver(value, piece)).join(', ')}]` : "'{}'",
-		formatDatatype: (name, datatype, def = null) => `"${name}" ${datatype}${def !== null ? ` NOT NULL DEFAULT ${def}` : ''}`
-	});
-
-	private db?: Pool;
-	private dbconnection?: PoolClient;
-
-	constructor(client: KlasaClient, store: ProviderStore, file: string[], dir: string) {
-		super(client, store, file, dir);
+	constructor(...args) {
+		super(...args);
+		this.qb = new QueryBuilder({
+			boolean: 'BOOL',
+			integer: ({ max }) => max !== null && max >= 2 ** 32 ? 'BIGINT' : 'INTEGER',
+			float: 'DOUBLE PRECISION',
+			uuid: 'UUID',
+			json: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
+      any: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
+      filteredword: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
+      case: { type: 'JSON', resolver: (input) => `'${JSON.stringify(input)}'::json` },
+			array: type => `${type}[]`,
+			arrayResolver: (values, piece, resolver) => values.length ? `array[${values.map(value => resolver(value, piece)).join(', ')}]` : "'{}'",
+			formatDatatype: (name, datatype, def = null) => `"${name}" ${datatype}${def !== null ? ` NOT NULL DEFAULT ${def}` : ''}`
+		});
+		this.db = null;
 	}
 
 	async init() {
-		const connection = util.mergeDefault({
+		const connection = mergeDefault({
 			host: 'localhost',
 			port: 5432,
       database: '',
@@ -67,13 +54,13 @@ export default class extends SQLProvider {
 
 	/* Table methods */
 
-	hasTable(table: string) {
+	hasTable(table) {
 		return this.runAll(`SELECT true FROM pg_tables WHERE tablename = '${table}';`)
 			.then(result => result.length !== 0 && result[0].bool === true)
 			.catch(() => false);
 	}
 
-	createTable(table: string, rows?: any[]) {
+	createTable(table, rows) {
 		if (rows) return this.run(`CREATE TABLE ${sanitizeKeyName(table)} (${rows.map(([k, v]) => `${sanitizeKeyName(k)} ${v}`).join(', ')});`);
 		const gateway = this.client.gateways[table];
 		if (!gateway) throw new Error(`There is no gateway defined with the name ${table} nor an array of rows with datatypes have been given. Expected any of either.`);
@@ -86,18 +73,18 @@ export default class extends SQLProvider {
 		);
 	}
 
-	deleteTable(table: string) {
+	deleteTable(table) {
 		return this.run(`DROP TABLE IF EXISTS ${sanitizeKeyName(table)};`);
 	}
 
-	countRows(table: string) {
+	countRows(table) {
 		return this.runOne(`SELECT COUNT(*) FROM ${sanitizeKeyName(table)};`)
 			.then(result => Number(result.count));
 	}
 
 	/* Row methods */
 
-	getAll(table: string, entries: string[] = []) {
+	getAll(table, entries = []) {
 		if (entries.length) {
 			return this.runAll(`SELECT * FROM ${sanitizeKeyName(table)} WHERE id IN ('${entries.join("', '")}');`)
 				.then(results => results.map(output => this.parseEntry(table, output)));
@@ -106,12 +93,12 @@ export default class extends SQLProvider {
 			.then(results => results.map(output => this.parseEntry(table, output)));
 	}
 
-	getKeys(table: string) {
+	getKeys(table) {
 		return this.runAll(`SELECT id FROM ${sanitizeKeyName(table)};`)
 			.then(rows => rows.map(row => row.id));
 	}
 
-	get(table: string, key: string, value?: string) {
+	get(table, key, value) {
 		// If a key is given (id), swap it and search by id - value
 		if (typeof value === 'undefined') {
 			value = key;
@@ -121,20 +108,20 @@ export default class extends SQLProvider {
 			.then(output => this.parseEntry(table, output));
 	}
 
-	has(table: string, id: string) {
+	has(table, id) {
 		return this.runOne(`SELECT id FROM ${sanitizeKeyName(table)} WHERE id = $1 LIMIT 1;`, [id])
 			.then(result => Boolean(result));
 	}
 
-	getRandom(table: string) {
+	getRandom(table) {
 		return this.runOne(`SELECT * FROM ${sanitizeKeyName(table)} ORDER BY RANDOM() LIMIT 1;`);
 	}
 
-	getSorted(table: string, key: string, order: 'ASC' | 'DESC' = 'DESC', limitMin?: number, limitMax?: number) {
+	getSorted(table, key, order = 'DESC', limitMin, limitMax) {
 		return this.runAll(`SELECT * FROM ${sanitizeKeyName(table)} ORDER BY ${sanitizeKeyName(key)} ${order} ${parseRange(limitMin, limitMax)};`);
 	}
 
-	create(table: string, id: string, data: any) {
+	create(table, id, data) {
 		const [keys, values] = this.parseUpdateInput(data, false);
 
 		// Push the id to the inserts.
@@ -147,7 +134,7 @@ export default class extends SQLProvider {
 			VALUES (${Array.from({ length: keys.length }, (__, i) => `$${i + 1}`).join(', ')});`, values);
 	}
 
-	update(table: string, id: string, data: SettingsUpdateResultEntry[] | [string, any][] | Record<string, any>) {
+	update(table, id, data) {
 		const [keys, values] = this.parseUpdateInput(data, false);
 		return this.run(`
 			UPDATE ${sanitizeKeyName(table)}
@@ -155,42 +142,42 @@ export default class extends SQLProvider {
 			WHERE id = '${id.replace(/'/g, "''")}';`, values);
 	}
 
-	replace(table: string, id: string, data: SettingsUpdateResultEntry[] | [string, any][] | Record<string, any>) {
-		return this.update(table, id, data);
+	replace(...args) {
+		return this.update(...args);
 	}
 
-	incrementValue(table: string, id: string, key: string, amount: number = 1) {
+	incrementValue(table, id, key, amount = 1) {
 		return this.run(`UPDATE ${sanitizeKeyName(table)} SET $2 = $2 + $3 WHERE id = $1;`, [id, key, amount]);
 	}
 
-	decrementValue(table: string, id: string, key: string, amount: number = 1) {
+	decrementValue(table, id, key, amount = 1) {
 		return this.run(`UPDATE ${sanitizeKeyName(table)} SET $2 = GREATEST(0, $2 - $3) WHERE id = $1;`, [id, key, amount]);
 	}
 
-	delete(table: string, id: string) {
+	delete(table, id) {
 		return this.run(`DELETE FROM ${sanitizeKeyName(table)} WHERE id = $1;`, [id]);
 	}
 
-	addColumn(table: string, piece: SchemaPiece) {
+	addColumn(table, piece) {
 		return this.run(piece.type !== 'Folder' ?
 			`ALTER TABLE ${sanitizeKeyName(table)} ADD COLUMN ${this.qb.parse(piece)};` :
 			`ALTER TABLE ${sanitizeKeyName(table)} ${[...piece.values(true)].map(subpiece => `ADD COLUMN ${this.qb.parse(subpiece)}`).join(', ')};`);
 	}
 
-	removeColumn(table: string, columns: string | string[]) {
+	removeColumn(table, columns) {
 		if (typeof columns === 'string') return this.run(`ALTER TABLE ${sanitizeKeyName(table)} DROP COLUMN ${sanitizeKeyName(columns)};`);
 		if (Array.isArray(columns)) return this.run(`ALTER TABLE ${sanitizeKeyName(table)} DROP COLUMN ${columns.map(sanitizeKeyName).join(', ')};`);
 		throw new TypeError('Invalid usage of PostgreSQL#removeColumn. Expected a string or string[].');
 	}
 
-	updateColumn(table: string, piece: SchemaPiece) {
+	updateColumn(table, piece) {
 		const [column, datatype] = this.qb.parse(piece).split(' ');
 		return this.run(`ALTER TABLE ${sanitizeKeyName(table)} ALTER COLUMN ${column} TYPE ${datatype}${piece.default ?
 			`, ALTER COLUMN ${column} SET NOT NULL, ALTER COLUMN ${column} SET DEFAULT ${this.qb.parseValue(piece.default, piece)}` : ''
 		};`);
 	}
 
-	getColumns(table: string, schema: 'public' = 'public') {
+	getColumns(table, schema = 'public') {
 		return this.runAll(`
 			SELECT column_name
 			FROM information_schema.columns
@@ -198,7 +185,6 @@ export default class extends SQLProvider {
 				AND table_name = $2;
 		`, [schema, table]).then(result => result.map(row => row.column_name));
 	}
-//    query<T extends Submittable>(queryStream: T): T;
 
 	run(...sql) {
 		return this.db.query(...sql)
@@ -222,7 +208,7 @@ export default class extends SQLProvider {
  * @returns {string}
  * @private
  */
-function sanitizeKeyName(value: string) {
+function sanitizeKeyName(value) {
 	if (typeof value !== 'string') throw new TypeError(`[SANITIZE_NAME] Expected a string, got: ${new Type(value)}`);
 	if (/`|"/.test(value)) throw new TypeError(`Invalid input (${value}).`);
 	if (value.charAt(0) === '"' && value.charAt(value.length - 1) === '"') return value;
@@ -235,10 +221,10 @@ function sanitizeKeyName(value: string) {
  * @returns {string}
  * @private
  */
-function parseRange(min: number, max: number) {
+function parseRange(min, max) {
 	// Min value validation
 	if (typeof min === 'undefined') return '';
-	if (!util.isNumber(min)) {
+	if (!isNumber(min)) {
 		throw new TypeError(`[PARSE_RANGE] 'min' parameter expects an integer or undefined, got ${min}`);
 	}
 	if (min < 0) {
@@ -247,7 +233,7 @@ function parseRange(min: number, max: number) {
 
 	// Max value validation
 	if (typeof max !== 'undefined') {
-		if (!util.isNumber(max)) {
+		if (!isNumber(max)) {
 			throw new TypeError(`[PARSE_RANGE] 'max' parameter expects an integer or undefined, got ${max}`);
 		}
 		if (max <= min) {
