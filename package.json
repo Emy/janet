@@ -10,7 +10,7 @@
     "build": "tsc -b src",
     "start": "node dist/index.js",
     "lint": "eslint \"src/**\" --fix",
-    "dev": "yarn lint && yarn build && yarn build"
+    "dev": "yarn lint && yarn build && yarn start"
   },
   "dependencies": {
     "discord.js": "discordjs/discord.js",
