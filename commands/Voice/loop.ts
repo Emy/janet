@@ -1,5 +1,4 @@
 import { Command, KlasaClient, CommandStore, KlasaMessage } from 'klasa';
-import { MessageEmbed } from 'discord.js';
 
 export default class extends Command {
   constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
@@ -14,14 +13,16 @@ export default class extends Command {
   }
 
   async run(msg: KlasaMessage, [...params]) {
-    if (!msg.checkVoicePermission()) return;
-    const player = this.client.music.get(msg.guild.id);
-    player.loop = !player.loop;
-    const title = player.loop ? 'LOOPED' : 'UNLOOPED';
-    const desc = player.loop ? 'LOOPED_DESCRIPTION' : 'UNLOOPED_DESCRIPTION';
+    // if (!msg.checkVoicePermission()) return;
+    // const player = this.client.music.get(msg.guild.id);
+    // player.loop = !player.loop;
+    // const title = player.loop ? 'LOOPED' : 'UNLOOPED';
+    // const desc = player.loop ? 'LOOPED_DESCRIPTION' : 'UNLOOPED_DESCRIPTION';
 
-    msg.sendEmbed(new MessageEmbed()
-        .setTitle(msg.language.get(title))
-        .setDescription(msg.language.get(desc)))
+    // msg.sendEmbed(new MessageEmbed()
+    //     .setTitle(msg.language.get(title))
+    //     .setDescription(msg.language.get(desc)))
+
+    return null;
   }
 };

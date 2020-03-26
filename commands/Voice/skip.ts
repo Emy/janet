@@ -12,13 +12,15 @@ export default class extends Command {
   }
 
   async run(msg: KlasaMessage, [...paran]) {
-    if (!msg.checkVoicePermission()) return;
-    const lang = msg.language;
-    const player = this.client.music.get(msg.guild.id);
-    msg.genEmbed()
-        .setTitle(lang.get('SKIP'))
-        .setDescription(lang.get('SKIPPING_TRACK'))
-        .send();
-    player.stop();
+    // if (!msg.checkVoicePermission()) return;
+    // const lang = msg.language;
+    // const player = this.client.music.get(msg.guild.id);
+    // msg.genEmbed()
+    //     .setTitle(lang.get('SKIP'))
+    //     .setDescription(lang.get('SKIPPING_TRACK'))
+    //     .send();
+    // player.stop();
+
+    return null;
   }
 };
