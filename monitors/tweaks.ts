@@ -1,12 +1,12 @@
-const { Monitor, RichDisplay } = require('klasa');
-const { MessageEmbed } = require('discord.js');
-const fetch = require('node-fetch');
+import { Monitor, RichDisplay, KlasaClient, MonitorStore, KlasaMessage } from 'klasa';
+import { MessageEmbed } from 'discord.js';
+import fetch from 'node-fetch';
 
 
-module.exports = class extends Monitor {
+export default class extends Monitor {
 
-  constructor(...args) {
-    super(...args, {
+  constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
+    super(client, store, file, dir, {
       enabled: true,
       ignoreBots: true,
       ignoreSelf: true,
@@ -16,7 +16,7 @@ module.exports = class extends Monitor {
     });
   }
 
-  async run(msg) {
+  async run(msg: KlasaMessage) {
     const regex = new RegExp(/\[\[(.*)\]\]/);
     const matches = regex.exec(msg.content);
     if (!matches || !matches[1]) return;
@@ -31,7 +31,7 @@ module.exports = class extends Monitor {
       .setColor('GREEN')
       .addField('Repo', `[${tweak.repo ? tweak.repo.name : tweak.repo_name}](${tweak.repo ? tweak.repo.url : tweak.repo_url})`, true)
       .addField('Version', tweak.version, true)
-      .addField('Price', tweak.paid ? await this.getTweakPrice(tweak) : 'FREE', true)
+      .addField('Price', tweak.paid ? await this.getTweakPrice(msg, tweak) : 'FREE', true)
       .addField('BundleID', tweak.name, true)
       .addField('Download', tweak.deb ? `[Click here](${tweak.deb})` : 'Not available.', true)
       .addField('Description', tweak.summary)
@@ -48,7 +48,7 @@ module.exports = class extends Monitor {
       .setFooter('Provided by: jlippold.github.io')
       .setTimestamp();
 
-      if(!compatibilityData || !compatibilityData.length > 0) tweakCompatibilityEmbed.addField('Version Data', 'No version data found.');
+      if(!compatibilityData || !(compatibilityData.length > 0)) tweakCompatibilityEmbed.addField('Version Data', 'No version data found.');
       for (let version of compatibilityData) {
         let emoji = '❔'
         switch(version.status.toLowerCase()) {
@@ -67,18 +67,18 @@ module.exports = class extends Monitor {
 
   async init() {}
 
-  async getTweakPrice(tweak) {
+  async getTweakPrice(msg: KlasaMessage, tweak: { type: any; name: any; }) {
     const response = await fetch(`https://tss-saver.cloud.tyk.io/repoapi/v1/price?type=${tweak.type}&query=${tweak.name}`);
-    if (response.statusCode === 429) return msg.send('Ratelimit reached!');
+    if (response.status === 429) return msg.send('Ratelimit reached!');
     const data = await response.text();
-    if (data.length === 0 || data == 0) return 'Paid';
+    if (data.length === 0 || data == "0") return 'Paid';
     return `$${data}`;
   }
 
-  async getCompatibilityData(tweak) {
+  async getCompatibilityData(tweak: { name: any; version: any; }) {
     const response = await fetch(`https://jlippold.github.io/tweakCompatible/json/packages/${tweak.name}.json`);
     const data = await response.json();
-    const reports = data.versions.filter((v) => v.tweakVersion === tweak.version && parseInt(v.iOSVersion.split('.')[0]) >= 11)
+    const reports = data.versions.filter((v: { tweakVersion: any; iOSVersion: string; }) => v.tweakVersion === tweak.version && parseInt(v.iOSVersion.split('.')[0]) >= 11)
     const result = [];
     for (let report of reports) {
       result.push({
