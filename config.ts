@@ -61,7 +61,7 @@ export const config: KlasaClientOptions = {
      options: {}
    },
 
-    default: 'json'
+    default: 'postgresql'
   },
 
   /**
