@@ -8,3 +8,10 @@ cache:
         - node_modules
 script:
     - yarn build
+jobs:
+    include:
+      - stage: "Tests"
+        name: "Jest tests"
+        script: yarn run jest
+      - name: "ESLint"
+        script: yarn run eslint
