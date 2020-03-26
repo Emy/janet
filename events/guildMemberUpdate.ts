@@ -58,7 +58,9 @@ export default class extends Event {
           .addField('Role', `${newRole.map(role => role.name)}`, true)
           .setFooter(oldMember.user.id)
           .setTimestamp();
-      this.client.channels.cache.get(channelID).send(embed);
+          
+      const channel = this.client.channels.cache.get(channelID) as TextChannel;
+      channel.send(embed);
       }
   }
 

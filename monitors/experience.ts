@@ -22,16 +22,16 @@ export default class extends Monitor {
     await message.author.settings.update('xp', currentXP + gainedXP);
     await message.author.settings.update('level', this.getLevel(currentXP + gainedXP));
 
-    if (message.author.settings.level >= 15 && message.guild.settings.roles.memberplus) {
-      await message.member.roles.add(message.guild.settings.roles.memberplus);
+    if (message.author.settings.get('level') >= 15 && message.guild.settings.get('roles.memberplus')) {
+      await message.member.roles.add(message.guild.settings.get('roles.memberplus'));
     }
 
-    if (message.author.settings.level >= 30 && message.guild.settings.roles.memberpro) {
-      await message.member.roles.add(message.guild.settings.roles.memberpro);
+    if (message.author.settings.get('level') >= 30 && message.guild.settings.get('roles.memberpro')) {
+      await message.member.roles.add(message.guild.settings.get('roles.memberpro'));
     }
 
-    if (message.author.settings.level >= 50 && message.guild.settings.roles.memberedition) {
-      await message.member.roles.add(message.guild.settings.roles.memberedition)
+    if (message.author.settings.get('level') >= 50 && message.guild.settings.get('roles.memberedition')) {
+      await message.member.roles.add(message.guild.settings.get('roles.memberedition'))
     }
   }
 

@@ -36,7 +36,9 @@ export default class extends Command {
     const c = await this.buildCase(msg, reason, member.user, warnPointDiff)
     
     msg.delete();
-    return this.sendEmbed(msg, member, reason, c)
+    this.sendEmbed(msg, member, reason, c)
+
+    return null;
   }
 
   async init() {}

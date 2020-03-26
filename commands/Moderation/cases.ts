@@ -49,7 +49,9 @@ export default class extends Command {
     if (counter % 10 !== 0) display.addPage(embed);
 
     msg.delete();
-    return display.run(msg);
+    display.run(msg);
+
+    return null;
   }
 
   async init() {}

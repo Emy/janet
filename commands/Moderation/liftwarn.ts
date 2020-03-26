@@ -33,7 +33,9 @@ export default class extends Command {
   async run(msg: KlasaMessage, [member, points, reason] : [GuildMember, number, string]) {
     if (member.user.settings.get('warnPoints') < points) points = member.user.settings.get('warnPoints');
     await member.user.settings.update('warnPoints', points * -1);
-    const c = this.buildCase(msg, reason, points, member.user);
+    this.buildCase(msg, reason, points, member.user);
+
+    return null
   }
 
   async init() {}

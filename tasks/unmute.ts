@@ -46,7 +46,9 @@ export default class extends Task {
       .setTimestamp();
 
     const channel = this.client.channels.cache.get(channelID) as TextChannel
-    return channel.send(embed);
+    channel.send(embed);
+
+    return null;
   }
 
   async init() {}
