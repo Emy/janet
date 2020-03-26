@@ -34,9 +34,12 @@ export default class extends Command {
       word: word,
       priority: priority
     });
-    await msg.guild.settings.update('filter.words', fw, { action: 'add' });
+    await msg.guild.settings.update('filter.words', fw, { action: 'add' })
     
-    return msg.send(`Added ${word} with priority ${priority}.`);
+    msg.send(`Added ${word} with priority ${priority}.`);
+    msg.delete()
+
+    return null;
   }
 
   async init() {}

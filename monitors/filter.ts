@@ -1,6 +1,6 @@
 import { MessageEmbed, TextChannel, Collection, GuildMember } from 'discord.js';
 import { KlasaClient, MonitorStore, KlasaMessage, Duration, Monitor, RateLimit, KlasaUser } from 'klasa';
-import ASCIIFolder from 'fold-to-ascii'
+var ASCIIFolder = require("fold-to-ascii");
 
 import Case from "../util/case"
 

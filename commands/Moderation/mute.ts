@@ -1,5 +1,5 @@
 import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
-import { Command, KlasaMessage, KlasaUser } from 'klasa';
+import { Command, KlasaMessage, KlasaUser, KlasaClient, CommandStore } from 'klasa';
 import moment from 'moment';
 
 import Case from '../../util/case';

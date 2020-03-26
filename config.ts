@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { KlasaClientOptions } from "klasa";
 
 /**
@@ -60,7 +61,7 @@ export const config: KlasaClientOptions = {
      options: {}
    },
 
-    default: 'postgresql'
+    default: 'json'
   },
 
   /**
@@ -131,7 +132,7 @@ export const config: KlasaClientOptions = {
    * Console Event Handlers (enabled/disabled)
    */
   consoleEvents: {
-    debug: false,
+    debug: true,
     error: true,
     log: true,
     verbose: false,

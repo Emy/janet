@@ -19,8 +19,9 @@ export default class extends Monitor {
     const matches = regex.exec(msg.content);
     if (!matches) return;
     if (!msg.guild.settings.get('roles.moderator')) return;
+    // @ts-ignore
     if (msg.guild.settings.get('roles.moderator').position <= msg.author.role) return;
-    await msg.delete();
+    msg.delete();
   }
 
   async init() {}
