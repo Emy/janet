@@ -3,3 +3,4 @@ src/config.js
 yarn.lock
 .env
 bwd
+dist
