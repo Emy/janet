@@ -17,24 +17,26 @@ export default class extends Command {
             deletable: false,
             guarded: false,
             nsfw: false,
-            permissionLevel: 5,
+            permissionLevel: 6,
             description: 'Adds word to filter list with silent or reportable delete.',
-            extendedHelp: '!filter <0 | 1> <string to filter> 0 = Silent, 1 = Report',
-            usage: '<priority:integer> <word:...string>',
+            extendedHelp:
+                '!filter <true | false> <role priority to be excluded> <string> True = Should Report, False = Silent Delete',
+            usage: '<notify:boolean> <bypass:integer> <word:...string>',
             usageDelim: ' ',
             quotedStringSupport: false,
             subcommands: false,
         });
     }
 
-    async run(msg: KlasaMessage, [priority, word]: [number, string]) {
+    async run(msg: KlasaMessage, [notify, bypass, word]: [boolean, number, string]) {
         const fw = new FilteredWord({
+            notify: notify,
+            bypass: bypass,
             word: word,
-            priority: priority,
         });
         await msg.guild.settings.update('filter.words', fw, { action: 'add' });
 
-        msg.send(`Added ${word} with priority ${priority}.`);
+        msg.send(`Added ${word} ${notify ? 'with' : 'without'} notifications and bypass level ${bypass}.`);
         msg.delete();
 
         return null;
