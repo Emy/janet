@@ -1,7 +1,7 @@
 import { Command, CommandStore, KlasaMessage } from 'klasa';
 import JanetClient from '../../lib/client';
 
-module.exports = class extends Command {
+export default class extends Command {
     client: JanetClient;
     constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
@@ -20,4 +20,4 @@ module.exports = class extends Command {
         dispatcher.onEvent();
         return msg.send('I am stopping the music.');
     }
-};
+}
