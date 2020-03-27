@@ -1,9 +1,11 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
+import JanetClient from '../../lib/client';
 
 module.exports = class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    client: JanetClient;
+    constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: false,
+            enabled: true,
             runIn: ['text'],
             requiredPermissions: ['EMBED_LINKS'],
             aliases: ['leave'],
@@ -12,17 +14,10 @@ module.exports = class extends Command {
         });
     }
 
-    async run(msg: KlasaMessage, [...paran]) {
-        // if (!msg.checkVoicePermission()) return;
-        // const lang = msg.language;
-        // const emojis = this.client.emojis.cache;
-        // const dispatcher = this.client.queue.get(msg.guild.id);
-        // dispatcher.onEvent();
-        // msg.genEmbed()
-        //     .setTitle(`${emojis.get(emoji.stop)} ${lang.get('STOP')}`)
-        //     .setDescription(lang.get('STOPPING'))
-        //     .send();
-
-        return null;
+    async run(msg: KlasaMessage) {
+        const dispatcher = this.client.queue.get(msg.guild.id);
+        if (!dispatcher) return;
+        dispatcher.onEvent();
+        return msg.send('I am stopping the music.');
     }
 };
