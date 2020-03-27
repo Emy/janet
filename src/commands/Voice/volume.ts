@@ -1,9 +1,12 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
+import JanetClient from '../../lib/client';
+import Dispatcher from '../../util/dispatcher';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    client: JanetClient;
+    constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: false,
+            enabled: true,
             runIn: ['text'],
             requiredPermissions: [],
             cooldown: 5,
@@ -12,26 +15,13 @@ export default class extends Command {
         });
     }
 
-    async run(msg: KlasaMessage, [volume]) {
-        // if (!msg.checkVoicePermission()) return;
-        // const player = this.client.music.get(msg.guild.id);
-        // const emojis = this.client.emojis.cache;
-        // const lang = msg.language;
-        // if (!volume) {
-        //   return msg.genEmbed()
-        //       .setTitle(`${emojis.get(emoji.volume)} ${lang.get('VOLUME')}`)
-        //       .setDescription(lang.get('CURRENT_VOLUME', player.state.volume))
-        //       .send();
-        // }
-        // if (volume <= 0 || volume > 200) {
-        //   return msg.sendError('VOLUME_RESTRICTION');
-        // }
-        // msg.genEmbed()
-        //     .setTitle(`${emojis.get(emoji.volume)} ${lang.get('VOLUME')}`)
-        //     .setDescription(lang.get('SETTING_VOLUME', volume))
-        //     .send();
-        // player.volume(volume);
-
-        return null;
+    async run(msg: KlasaMessage, [volume]: [number]) {
+        if (!this.client.queue.get(msg.guild.id)) return msg.send('No music playing in here.');
+        const dispatcher = this.client.queue.get(msg.guild.id);
+        if (!dispatcher) return msg.send('I could not change the volume');
+        if (volume > 200 || volume < 1) return msg.send('Volume restriction 1%-200%');
+        dispatcher as Dispatcher;
+        await dispatcher.player.setVolume(volume);
+        return msg.send(`Set volume to ${volume}`);
     }
 }
