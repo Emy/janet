@@ -1,11 +1,27 @@
+import { TextChannel } from 'discord.js';
+import { KlasaGuild } from 'klasa';
+import { ShoukakuPlayer, Track } from 'shoukaku';
+import JanetClient from '../lib/client';
+
 class EventHandlers {
-    static onEvent(param) {
+    static onEvent(param: unknown) {
         if (param instanceof Error || param instanceof Object) console.error(param);
         this.leave();
+    }
+    static leave() {
+        return null;
     }
 }
 
 class Dispatcher {
+    client: JanetClient;
+    guild: KlasaGuild;
+    textChanel: TextChannel;
+    player: ShoukakuPlayer;
+    queue: Track[];
+    playing: boolean;
+    onEvent: (param: unknown) => void;
+    current: Track;
     constructor(options) {
         this.client = options.client;
         this.guild = options.guild;
@@ -41,7 +57,7 @@ class Dispatcher {
         this.textChanel.send(`Playing: ${this.current.info.title}`);
     }
 
-    async addTrack(track) {
+    async addTrack(track: Track) {
         this.queue.push(track);
     }
 }
