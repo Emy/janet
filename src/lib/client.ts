@@ -62,8 +62,6 @@ export default class JanetClient extends KlasaClient {
             .add('level', 'integer', { default: 0, min: 0, configurable: false })
             .add('cases', 'any', { array: true, configurable: false })
             .add('offlineReportPing', 'boolean', { default: false, configurable: false });
-
-        console.log(shoukakuNodes);
         this.shoukaku = new Shoukaku(this, shoukakuNodes, shoukakuConfig);
         this.queue = new Queue(this);
         this.shoukaku.on('ready', (name, resumed) =>
