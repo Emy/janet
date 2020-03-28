@@ -52,7 +52,7 @@ class Dispatcher {
     }
 
     async play() {
-        if (!this.client.queue.has(this.guild.id) || !this.queue.length) return this.leave();
+        if (!this.client.queue.has(this.guild.id) || (!this.queue.length && !this.loop)) return this.leave();
         if (!this.loop) this.current = this.queue.shift();
         await this.player.playTrack(this.current.track);
         this.playing = true;
