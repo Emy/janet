@@ -23,6 +23,7 @@ export default class extends Command {
             messages = messages.filter(this.getFilter(msg, type, user));
         }
         const messageArray = messages.array().slice(0, limit);
+        msg.delete();
         await msg.channel.bulkDelete(messageArray);
         const res = (await msg.send(
             `Successfully deleted ${messageArray.length} messages from ${limit}.`,
