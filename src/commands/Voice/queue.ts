@@ -1,7 +1,10 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage, RichDisplay } from 'klasa';
+import JanetClient from '../../lib/client';
+import Dispatcher from '../../util/dispatcher';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    client: JanetClient;
+    constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
             enabled: false,
             runIn: ['text'],
@@ -12,7 +15,11 @@ export default class extends Command {
         });
     }
 
-    async run(msg: KlasaMessage, [...params]) {
+    async run(msg: KlasaMessage) {
+        if (!this.client.queue.get(msg.guild.id)) return msg.send('No music playing in here.');
+        const dispatcher = this.client.queue.get(msg.guild.id) as Dispatcher;
+        if (!dispatcher) return msg.send('I could not loop/unloop');
+        const display = new RichDisplay();
         // if (!msg.checkVoicePermission()) return;
         // const lang = msg.language;
         // const dispatcher = this.client.queue.get(msg.guild.id);
