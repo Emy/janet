@@ -1,9 +1,12 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
+import JanetClient from '../../lib/client';
+import Dispatcher from '../../util/dispatcher';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    client: JanetClient;
+    constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: false,
+            enabled: true,
             runIn: ['text'],
             requiredPermissions: ['EMBED_LINKS'],
             aliases: ['np'],
@@ -12,22 +15,11 @@ export default class extends Command {
         });
     }
 
-    async run(msg: KlasaMessage, [...params]) {
-        // if (!msg.checkVoicePermission()) return;
-        // const lang = msg.language;
-        // const player = this.client.music.get(msg.guild.id);
-        // const song = player.songs[0];
-        // const emojis = this.client.emojis.cache;
-        // msg.genEmbed()
-        //     .setTitle(`${emojis.get(emoji.play)} ${lang.get('NOW_PLAYING')}`)
-        //     .setDescription(Util.escapeMarkdown(song.info.title))
-        //     .setThumbnail(`https://img.youtube.com/vi/${song.info.identifier}/default.jpg`)
-        //     .addField(
-        //         `${emojis.get(emoji.time)} ${lang.get('LENGTH')}`,
-        //         msg.genHMDTime(song.info.length),
-        //         true)
-        //     .send();
-
-        return null;
+    async run(msg: KlasaMessage) {
+        if (!this.client.queue.get(msg.guild.id)) return msg.send('No music playing in here.');
+        const dispatcher = this.client.queue.get(msg.guild.id);
+        if (!dispatcher) return msg.send('I could not loop/unloop');
+        dispatcher as Dispatcher;
+        return msg.send(`Now playing: ${dispatcher.current.info.title}`);
     }
 }
