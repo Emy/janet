@@ -70,7 +70,7 @@ export default class extends Monitor {
         return display.run(msg, { firstLast: false, jump: false, time: 120000 });
     }
 
-    async getTweakPrice(msg: KlasaMessage, tweak: { type: any; name: any }) {
+    async getTweakPrice(msg: KlasaMessage, tweak: { type: string; name: string }) {
         const response = await fetch(
             `https://tss-saver.cloud.tyk.io/repoapi/v1/price?type=${tweak.type}&query=${tweak.name}`,
         );
@@ -80,11 +80,11 @@ export default class extends Monitor {
         return `$${data}`;
     }
 
-    async getCompatibilityData(tweak: { name: any; version: any }) {
+    async getCompatibilityData(tweak: { name: string; version: string }) {
         const response = await fetch(`https://jlippold.github.io/tweakCompatible/json/packages/${tweak.name}.json`);
         const data = await response.json();
         const reports = data.versions.filter(
-            (v: { tweakVersion: any; iOSVersion: string }) =>
+            (v: { tweakVersion: string; iOSVersion: string }) =>
                 v.tweakVersion === tweak.version && parseInt(v.iOSVersion.split('.')[0]) >= 11,
         );
         const result = [];
