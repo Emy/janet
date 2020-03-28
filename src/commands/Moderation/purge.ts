@@ -24,7 +24,11 @@ export default class extends Command {
         }
         const messageArray = messages.array().slice(0, limit);
         await msg.channel.bulkDelete(messageArray);
-        return msg.sendMessage(`Successfully deleted ${messageArray.length} messages from ${limit}.`);
+        const res = (await msg.send(
+            `Successfully deleted ${messageArray.length} messages from ${limit}.`,
+        )) as KlasaMessage;
+        res.delete({ timeout: 2500 });
+        return null;
     }
 
     getFilter(msg: KlasaMessage, filter: string, user: KlasaUser) {
