@@ -2,12 +2,17 @@ import { MessageEmbed, TextChannel } from 'discord.js';
 import { KlasaClient, Task, TaskStore } from 'klasa';
 import Case from '../util/case';
 
+type unmuteData = {
+    guildID: string;
+    memberID: string;
+};
+
 export default class extends Task {
     constructor(client: KlasaClient, store: TaskStore, file: string[], dir: string) {
         super(client, store, file, dir, { enabled: true });
     }
 
-    async run(data: any) {
+    async run(data: unmuteData) {
         const guild = this.client.guilds.cache.get(data.guildID);
         if (!guild) return;
         const member = guild.members.cache.get(data.memberID);
