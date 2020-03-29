@@ -37,7 +37,6 @@ export default class extends Command {
         await msg.guild.settings.update('filter.words', fw, { action: 'add' });
 
         msg.send(`Added ${word} ${notify ? 'with' : 'without'} notifications and bypass level ${bypass}.`);
-        msg.delete();
 
         return null;
     }

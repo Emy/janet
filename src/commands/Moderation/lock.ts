@@ -34,7 +34,6 @@ export default class extends Command {
 
         await channel.updateOverwrite(everyone, { SEND_MESSAGES: !isLocked });
 
-        msg.delete();
         return msg.send(`Channel ${isLocked ? 'locked' : 'unlocked'}.`);
     }
 }

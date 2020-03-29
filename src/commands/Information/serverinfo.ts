@@ -30,7 +30,6 @@ export default class extends Command {
             .setTimestamp();
 
         msg.send(embed);
-        msg.delete();
         return null;
     }
 }

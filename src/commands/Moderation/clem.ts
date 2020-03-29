@@ -33,7 +33,6 @@ export default class extends Command {
         await member.user.settings.update('warnPoints', 599);
         const c = await this.buildCase(msg, reason, member.user, warnPointDiff);
 
-        msg.delete();
         this.sendEmbed(msg, member, reason, c);
 
         return null;
