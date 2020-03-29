@@ -1,8 +1,7 @@
+require('dotenv').config();
 import { Client, KlasaClient, KlasaClientOptions } from 'klasa';
 import { Shoukaku } from 'shoukaku';
 import Queue from '../util/queue';
-
-require('dotenv').config();
 
 const shoukakuConfig = {
     moveOnDisconnect: true,
