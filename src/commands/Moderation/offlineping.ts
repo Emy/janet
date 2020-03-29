@@ -29,7 +29,6 @@ export default class extends Command {
     async run(msg: KlasaMessage, [bool]: [boolean]) {
         msg.author.settings.update('offlineReportPing', bool);
 
-        msg.delete();
         return msg.send(`Offline ping set to: ${bool}`);
     }
 }

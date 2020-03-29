@@ -43,7 +43,6 @@ export default class extends Command {
         }
 
         this.sendEmbed(msg, member, reason, duration, c);
-        msg.delete();
     }
 
     async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, duration: Date) {

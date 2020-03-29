@@ -38,7 +38,6 @@ export default class extends Command {
             if (notify == fw.notify && bypass == fw.bypass) content += output;
         });
 
-        msg.delete();
         return msg.send(content);
     }
 }

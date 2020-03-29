@@ -26,7 +26,6 @@ export default class extends Command {
         await member.ban({ days: 1, reason: reason ? reason : 'No reason.' });
         const c = await this.buildCase(msg, reason, member.user);
         this.sendEmbed(msg, member, reason, c);
-        msg.delete();
     }
 
     async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser) {

@@ -25,7 +25,6 @@ export default class extends Command {
         await member.user.settings.update('isMuted', false);
         const c = await this.buildCase(msg, reason, member.user);
         this.sendEmbed(msg, member, reason, c);
-        msg.delete();
     }
 
     async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser) {

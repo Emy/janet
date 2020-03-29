@@ -38,6 +38,5 @@ export default class extends Command {
             .addField('Uptime', Duration.toNow(Date.now() - process.uptime() * 1000), true)
             .setTimestamp();
         msg.send(embed);
-        msg.delete();
     }
 }

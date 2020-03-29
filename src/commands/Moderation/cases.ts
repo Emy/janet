@@ -47,7 +47,6 @@ export default class extends Command {
         });
         if (counter % 10 !== 0) display.addPage(embed);
 
-        msg.delete();
         display.run(msg);
 
         return null;

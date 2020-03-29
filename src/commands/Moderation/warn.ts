@@ -40,7 +40,6 @@ export default class extends Command {
             await member.user.settings.update('warnKicked', true);
             await this.sendKickEmbed(msg, member);
         }
-        msg.delete();
     }
 
     async buildCase(msg: KlasaMessage, reason: string, points: number, user: KlasaUser) {
