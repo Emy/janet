@@ -51,7 +51,7 @@ export default class extends Command {
         const embed = new MessageEmbed()
             .setTitle('Member Banned')
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
-            .setColor('RED')
+            .setColor('AQUA')
             .addField('Member', `${member.user.tag} (<@${member.id}>)`)
             .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`)
             .addField('Reason', reason ? reason : 'No reason.')
