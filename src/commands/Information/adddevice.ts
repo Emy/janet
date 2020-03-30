@@ -55,7 +55,6 @@ export default class extends Command {
                 await fetch('https://api.ipsw.me/v4/device/' + device.identifier + '?type=ipsw').then((r) => r.json())
             )['firmwares'];
             await loadingMessage.edit('What OS version are you on?\nEg. 13.3, 12.4');
-            console.log(firmwares);
             const firmwareCollector = new MessageCollector(
                 msg.channel as TextChannel,
                 (m) => m.author.id === msg.author.id,
