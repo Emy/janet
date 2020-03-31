@@ -51,7 +51,7 @@ export default class extends Command {
         const embed = new MessageEmbed()
             .setTitle('Member Kicked')
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
-            .setColor('RED')
+            .setColor('DARK_GREEN')
             .addField('Member', `${member.user.tag} (<@${member.id}>)`, true)
             .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
             .addField('Reason', reason ? reason : 'No reason.')
