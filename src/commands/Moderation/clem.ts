@@ -65,7 +65,7 @@ export default class extends Command {
             .setTitle('Member Clemed')
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
             .setColor('RED')
-            .addField('Member', `${member.user.tag} (<@${member.user.id})`, true)
+            .addField('Member', `${member.user.tag} (${member})`, true)
             .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
             .addField('Warn Points', member.user.settings.get('warnPoints'))
             .addField('Reason', reason ? reason : 'No reason.')
