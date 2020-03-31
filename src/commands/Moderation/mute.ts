@@ -68,7 +68,7 @@ export default class extends Command {
         const embed = new MessageEmbed()
             .setTitle('Member Muted')
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
-            .setColor('RED')
+            .setColor('LUMINOUS_VIVID_PINK')
             .addField('Member', `${member.user.tag} (<@${member.id}>)`, true)
             .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
             .addField('Duration', duration ? moment().to(duration.toISOString(), true) : 'PERMANENT')
