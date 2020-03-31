@@ -29,6 +29,8 @@ export default class extends Command {
     async run(msg: KlasaMessage, [member, reason]: [GuildMember, string]) {
         await member.user.settings.update('clem', true);
         await member.user.settings.update('xpFrozen', true);
+        await member.user.settings.update('xp', 0);
+        await member.user.settings.update('level', 0);
         const warnPointDiff = 599 - member.user.settings.get('warnPoints');
         await member.user.settings.update('warnPoints', 599);
         const c = await this.buildCase(msg, reason, member.user, warnPointDiff);
@@ -63,7 +65,7 @@ export default class extends Command {
             .setTitle('Member Clemed')
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
             .setColor('RED')
-            .addField('Member', `${member.user.tag} (<@${member.user.id})`, true)
+            .addField('Member', `${member.user.tag} (${member})`, true)
             .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`, true)
             .addField('Warn Points', member.user.settings.get('warnPoints'))
             .addField('Reason', reason ? reason : 'No reason.')
