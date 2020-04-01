@@ -15,10 +15,11 @@ export default class extends Command {
     }
 
     async run(msg: KlasaMessage) {
-        if (!this.client.queue.get(msg.guild.id)) return msg.send('No music playing in here.');
-        const dispatcher = this.client.queue.get(msg.guild.id);
-        if (!dispatcher) return msg.send('I could not skip the track');
-        dispatcher as Dispatcher;
+        const dispatcher = this.client.queue.get(msg.guild.id) as Dispatcher;
+        if (!dispatcher) return msg.send('No music playing in here.');
+        if (msg.member.voice.channel.id != dispatcher.player.voiceConnection.voiceChannelID) {
+            return msg.send('We need to be in the same voice channel.');
+        }
         dispatcher.loop = false;
         if (dispatcher.player.stopTrack()) return msg.send('Skipped the track.');
         return msg.send('I could not skip the track');

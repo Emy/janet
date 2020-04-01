@@ -14,10 +14,9 @@ export default class extends Event {
 
     async run(oldMember: GuildMember, newMember: GuildMember) {
         if (!(oldMember && newMember)) return;
-        const dispatcher = this.client.queue.get(oldMember.guild.id);
+        const dispatcher = this.client.queue.get(oldMember.guild.id) as Dispatcher;
         if (!dispatcher) return;
-        dispatcher as Dispatcher;
         const voiceChannel = oldMember.guild.channels.cache.get(dispatcher.player.voiceConnection.voiceChannelID);
-        if (voiceChannel.members.size === 1) dispatcher.onEvent();
+        if (voiceChannel.members.size === 1) dispatcher.onEvent(undefined);
     }
 }
