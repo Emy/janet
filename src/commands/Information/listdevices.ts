@@ -1,161 +1,83 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage, RichDisplay } from 'klasa';
-import fetch from 'node-fetch';
+import { Command, KlasaMessage, RichDisplay } from 'klasa';
 import { MessageEmbed } from 'discord.js';
+import { getDevices, IDevice } from 'ipswme';
 
-interface APIDevice {
-    name: string;
-    identifier: string;
-    boardconfig: string;
-    platform: string;
-    cpid: number;
-    bdid: number;
+interface CategorizedDevices {
+    iPhone: IDevice[];
+    iPod: IDevice[];
+    iPad: IDevice[];
+    AppleTV: IDevice[];
+    AppleWatch: IDevice[];
+    HomePod: IDevice[];
 }
 
+type DeviceCategory = 'iPhone' | 'iPod' | 'iPad' | 'AppleTV' | 'AppleWatch' | 'HomePod';
+
+const chunkSize = 20;
+
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
-            enabled: true,
-            runIn: ['text'],
-            requiredPermissions: ['SEND_MESSAGES'],
-            requiredSettings: [],
-            aliases: ['list'],
-            guarded: false,
-            permissionLevel: 0,
-            description: 'Lists devices available for !adddevice.',
-        });
-    }
+    description = 'List devices';
+    aliases = ['list'];
 
     async run(msg: KlasaMessage) {
-        const devices: APIDevice[] = await fetch('https://api.ipsw.me/v4/devices').then((r) => r.json());
-        const iPhonesEmbed1 = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('iPhone'))
-                .slice(0, 24)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('iPhones [1/2]')
-            .setColor('GREEN');
-        const iPhonesEmbed2 = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('iPhone'))
-                .slice(24)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('iPhones [2/2]')
-            .setColor('GREEN');
-        const iPadsEmbed1 = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('iPad'))
-                .slice(0, 24)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('iPads [1/3]')
-            .setColor('GREEN');
-        const iPadsEmbed2 = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('iPad'))
-                .slice(24, 48)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('iPads [2/3]')
-            .setColor('GREEN');
-        const iPadsEmbed3 = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('iPad'))
-                .slice(48)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('iPads [3/3]')
-            .setColor('GREEN');
-        const aTVsEmbed = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('Apple TV'))
-                .slice(0, 24)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('Apple TVs')
-            .setColor('GREEN');
-        const watchesEmbed = new MessageEmbed({
-            fields: devices
-                .filter((device) => device.name.startsWith('Apple Watch'))
-                .slice(0, 24)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('Apple Watches')
-            .setColor('GREEN');
-        const otherEmbed = new MessageEmbed({
-            fields: devices
-                .filter(
-                    (device) =>
-                        !device.name.startsWith('iPhone') &&
-                        !device.name.startsWith('iPad') &&
-                        !device.name.startsWith('Apple TV') &&
-                        !device.name.startsWith('Apple Watch'),
-                )
-                .slice(0, 24)
-                .map((device) => {
-                    return {
-                        name: device.name,
-                        value: device.identifier,
-                    };
-                }),
-        })
-            .setTimestamp()
-            .setTitle('Other')
-            .setColor('GREEN');
-        const embed = new RichDisplay()
-            .setFooterSuffix('Provided by: ipsw.me')
-            .addPage(iPhonesEmbed1)
-            .addPage(iPhonesEmbed2)
-            .addPage(iPadsEmbed1)
-            .addPage(iPadsEmbed2)
-            .addPage(iPadsEmbed3)
-            .addPage(aTVsEmbed)
-            .addPage(watchesEmbed)
-            .addPage(otherEmbed);
-        embed.run(msg, { firstLast: false, jump: false, time: 120000 });
+        const waitMsg = await msg.reply('Please wait...');
+        const display = new RichDisplay();
+        display.setFooterSuffix(` - Requested by ${msg.author.tag}`);
+
+        const allDevices = await getDevices();
+
+        const categorized = this.categorize(allDevices);
+
+        for (const category in categorized) {
+            const chunks = chunk(categorized[category as DeviceCategory], chunkSize);
+
+            for (const i in chunks) {
+                const embed = new MessageEmbed().setTimestamp();
+
+                embed.setTitle(`${category} [${Number(i) + 1}/${chunks.length}]`);
+
+                chunks[i].forEach((x) => embed.addField(x.name, x.identifier));
+
+                display.addPage(embed);
+            }
+        }
+
+        display.run(waitMsg as KlasaMessage);
+
         return null;
     }
+
+    private categorize(devices: IDevice[]): CategorizedDevices {
+        return devices.reduce((prev: any, val) => {
+            if (val.name.startsWith('iPhone')) {
+                if (!prev.iPhone) prev.iPhone = [];
+                prev.iPhone.push(val);
+            } else if (val.name.startsWith('iPod')) {
+                if (!prev.iPod) prev.iPod = [];
+                prev.iPod.push(val);
+            } else if (val.name.startsWith('iPad')) {
+                if (!prev.iPad) prev.iPad = [];
+                prev.iPad.push(val);
+            } else if (val.name.startsWith('Apple TV')) {
+                if (!prev.AppleTV) prev.AppleTV = [];
+                prev.AppleTV.push(val);
+            } else if (val.name.startsWith('Apple Watch')) {
+                if (!prev.AppleWatch) prev.AppleWatch = [];
+                prev.AppleWatch.push(val);
+            } else if (val.name.startsWith('HomePod')) {
+                if (!prev.HomePod) prev.HomePod = [];
+                prev.HomePod.push(val);
+            }
+
+            return prev;
+        }, {});
+    }
+}
+
+function chunk<T>(arr: T[], len: number): T[][] {
+    const chunks = [];
+    for (let i = 0; i < arr.length; i += len) {
+        chunks.push(arr.slice(i, i + len));
+    }
+    return chunks;
 }

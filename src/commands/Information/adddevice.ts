@@ -1,83 +1,66 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
-import fetch from 'node-fetch';
-import { Message, MessageCollector, TextChannel } from 'discord.js';
-
-interface APIFirmware {
-    identifier: string;
-    version: string;
-    buildid: string;
-    sha1sum: string;
-    md5sum: string;
-    filesize: string;
-    url: string;
-    releasedate: string;
-    uploaddate: string;
-    signed: boolean;
-}
-
-interface APIDevice {
-    name: string;
-    identifier: string;
-    boardconfig: string;
-    platform: string;
-    cpid: number;
-    bdid: number;
-}
+import { Command, CommandStore, KlasaClient, KlasaMessage, TextPrompt, Usage } from 'klasa';
+import { IDevice, getDevices, getDevice } from 'ipswme';
 
 export default class extends Command {
     constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: true,
+            promptLimit: 2,
+            promptTime: 30 * 1000,
             runIn: ['text'],
-            requiredPermissions: ['SEND_MESSAGES', 'MANAGE_NICKNAMES'],
-            requiredSettings: [],
-            aliases: ['add'],
-            guarded: false,
-            permissionLevel: 0,
-            description: 'Adds a device to your nickname.',
+            requiredPermissions: ['MANAGE_NICKNAMES'],
+            usage: '(device:device)',
+        });
+
+        this.createCustomResolver('device', async (arg: string) => {
+            if (!arg) throw `Missing device`;
+            const devices = await getDevices();
+
+            const exists = devices.find(
+                (x) =>
+                    x.name
+                        .replace(/\(.*\)$/, '')
+                        .trim()
+                        .toLowerCase() === arg.toLowerCase() ||
+                    x.name
+                        .replace(/\(.*\)$/, '')
+                        .replace(' Plus', '+')
+                        .trim()
+                        .toLowerCase() === arg.toLowerCase(),
+            );
+            if (exists) return exists;
+            throw `Device doesn't exist`;
         });
     }
 
-    async run(msg: KlasaMessage) {
-        const nickname = msg.member.displayName;
-        if (/.+ \[.+, \d+\.\d+(\.\d+)?]/g.test(nickname))
-            return msg.send('Sorry, but your nickname already has a device. Use `!removedevice` to remove it.');
-        const devices: APIDevice[] = await fetch('https://api.ipsw.me/v4/devices').then((r) => r.json());
-        const deviceCollector = new MessageCollector(msg.channel as TextChannel, (m) => m.author.id === msg.author.id, {
-            max: 1,
+    async run(msg: KlasaMessage, [device]: [IDevice]) {
+        if (msg.member!.nickname && /^.+ \[.+\,.+\]$/.test(msg.member!.nickname!)) {
+            return msg.reply('device already set') as Promise<KlasaMessage>;
+        }
+
+        const firmwares = await getDevice(device.identifier);
+
+        const usage = new Usage(msg.client as KlasaClient, '(version:version)', ' ');
+        usage.createCustomResolver('version', (arg: string) => {
+            const exists = firmwares.firmwares!.some((x) => x.version === arg);
+            if (exists) return arg;
+            throw `Version doesn't exist`;
         });
-        await msg.send('What device are you using?\nEg. iPhone 11, iPhone 8 (GSM)');
-        deviceCollector.on('collect', async (deviceMessage: Message) => {
-            const device = devices.find((d) => d.name.toLowerCase() === deviceMessage.content.toLowerCase());
-            if (!device) return msg.channel.send("Sorry, but that's not a valid device. Not sure? Try `!listdevices`.");
-            const loadingMessage = await msg.channel.send('Loading OS versions...');
-            const firmwares: APIFirmware[] = (
-                await fetch('https://api.ipsw.me/v4/device/' + device.identifier + '?type=ipsw').then((r) => r.json())
-            )['firmwares'];
-            await loadingMessage.edit('What OS version are you on?\nEg. 13.3, 12.4');
-            const firmwareCollector = new MessageCollector(
-                msg.channel as TextChannel,
-                (m) => m.author.id === msg.author.id,
-                {
-                    max: 1,
-                },
-            );
-            firmwareCollector.on('collect', async (firmwareMessage: Message) => {
-                const firmware = firmwares.find((f) => f.version === firmwareMessage.content);
-                if (!firmware)
-                    return msg.channel.send("Sorry, that's not a valid OS version for this device. Try again.");
-                const finalString = ` [${device.name}, ${firmware.version}]`;
-                msg.member.setNickname(msg.member.displayName + finalString).then(
-                    () => {
-                        msg.channel.send('Success! Added' + finalString + ' to your nickname.');
-                    },
-                    () => {
-                        // error callback
-                        msg.channel.send("Oops! I don't have permissions to change your nickname.");
-                    },
-                );
-            });
-        });
-        return null;
+
+        const prompt = new TextPrompt(msg, usage, { limit: 3 });
+
+        const response = await prompt.run('Please enter version');
+
+        const deviceName = device.name
+            .replace(/\(.*\)$/, '')
+            .replace(' Plus', '+')
+            .replace('Pro Max', 'PM')
+            .trim();
+        const nickname = `${msg.member!.displayName} [${deviceName},${response[0]}]`;
+
+        if (nickname.length > 32) return msg.reply('nickname too long') as Promise<KlasaMessage>;
+
+        msg.member!.setNickname(nickname);
+
+        return msg.reply(`nickname set to \`${nickname}\``) as Promise<KlasaMessage>;
     }
 }
