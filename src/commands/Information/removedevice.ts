@@ -3,32 +3,22 @@ import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
 export default class extends Command {
     constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: true,
             runIn: ['text'],
-            requiredPermissions: ['SEND_MESSAGES', 'MANAGE_NICKNAMES'],
-            requiredSettings: [],
-            aliases: ['remove'],
-            guarded: false,
-            permissionLevel: 0,
-            description: 'Removes a device from your nickname.',
+            requiredPermissions: ['MANAGE_NICKNAMES'],
         });
     }
 
     async run(msg: KlasaMessage) {
-        const nickname = msg.member.displayName;
-        if (!/.+ \[.+, \d+\.\d+(\.\d+)?]/g.test(nickname)) return msg.send("You don't have a device in your nickname!");
-        const nicknameChars = nickname.split('');
-        const openIndex = nicknameChars.lastIndexOf('[');
-        const newNickname = nickname.slice(0, openIndex - 1);
-        msg.member.setNickname(newNickname).then(
-            () => {
-                msg.send('Removed a device from your nickname.');
-            },
-            () => {
-                // error callback
-                msg.send('There was an error setting your nickname!');
-            },
-        );
-        return null;
+        if (!/^.+ \[.+\,.+\]$/.test(msg.member!.nickname!)) {
+            return msg.reply('no device set') as Promise<KlasaMessage>;
+        }
+
+        const nickname = msg.member!.nickname!.replace(/ \[.+,.+\]/, '');
+
+        if (nickname.length > 32) return msg.reply('nickname too long') as Promise<KlasaMessage>;
+
+        msg.member!.setNickname(nickname);
+
+        return msg.reply(`nickname set to \`${nickname}\``) as Promise<KlasaMessage>;
     }
 }
