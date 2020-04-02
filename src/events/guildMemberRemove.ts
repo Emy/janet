@@ -16,7 +16,8 @@ export default class extends Event {
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
             .setColor('#9012FE')
             .addField('User', `${member.user.tag} (<@${member.user.id}>)`)
-            .setFooter(member.user.id);
+            .setFooter(member.user.id)
+            .setTimestamp();
 
         const channel = this.client.channels.cache.get(member.guild.settings.get('channels.private')) as TextChannel;
         channel.send(embed);
