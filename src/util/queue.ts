@@ -11,6 +11,7 @@ export default class Queue extends Map {
     }
 
     async handleTrack(node: ShoukakuSocket, track: Track, msg: KlasaMessage): Promise<Dispatcher | null> {
+        if (!track) return;
         let dispatcher = this.get(msg.guild.id);
         if (!dispatcher) {
             const player = await node.joinVoiceChannel({

@@ -1,4 +1,5 @@
-import { Command, CommandStore, KlasaMessage } from 'klasa';
+import { MessageEmbed } from 'discord.js';
+import { Command, CommandStore, KlasaClient, KlasaMessage, TextPrompt, Usage } from 'klasa';
 import { LoadTrackResponse } from 'shoukaku';
 import JanetClient from '../../lib/client';
 
@@ -10,7 +11,7 @@ export default class extends Command {
             runIn: ['text'],
             requiredPermissions: ['EMBED_LINKS'],
             aliases: ['p'],
-            cooldown: 5,
+            cooldown: 0,
             description: (lang) => lang.get('PLAY_DESCRIPTION'),
             usage: '<track:...string>',
             usageDelim: ' ',
@@ -18,29 +19,49 @@ export default class extends Command {
     }
 
     async run(msg: KlasaMessage, [song]: [string]) {
-        if (!msg.member.voice.channel) return msg.send('NOT_IN_VC');
+        if (!(await msg.hasAtLeastPermissionLevel(5))) {
+            if (!msg.guild.settings.get('channels.botspam')) return;
+            if (msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+                return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+            }
+        }
+        if (!msg.member.voice.channel) return msg.send('You are not in a VoiceChannel right now.');
         const node = this.client.shoukaku.getNode();
-        const tracks = await node.rest.resolve(song, 'youtube');
+        const tracks = await node.rest.resolve(encodeURIComponent(song), 'youtube');
         if (!tracks) return msg.send('No tracks found.');
         if (Array.isArray(tracks)) {
             const dispatcher = await this.client.queue.handleTrack(node, tracks.shift(), msg);
             tracks.forEach((track) => {
                 this.client.queue.handleTrack(node, track, msg);
             });
-            // Added playlist
+            msg.send('Added Playlist...');
             if (dispatcher) await dispatcher.play();
             return null;
-            // Now playing
         }
 
         // Should be a LoadTrackResponse at this point.
         const ltr = tracks as LoadTrackResponse;
-
         if (Array.isArray(ltr.tracks)) {
-            const dispatcher = await this.client.queue.handleTrack(node, ltr.tracks[0], msg);
+            ltr.tracks = ltr.tracks.slice(0, 5);
+            const embed = new MessageEmbed()
+                .setTitle('Music search')
+                .setDescription('Type in the number of the track you wanna play...');
+            let counter = 1;
+            for (const track of ltr.tracks) {
+                embed.addField(`**#${counter++}** ${track.info.title}`, track.info.author);
+            }
+            await msg.send(embed);
+            const usage = new Usage(msg.client as KlasaClient, '(selection:selection)', ' ');
+            usage.createCustomResolver('selection', (arg: string) => {
+                const tracknumber = parseInt(arg);
+                if (tracknumber > 0 && tracknumber <= ltr.tracks.length) return tracknumber;
+                throw `Track number doesn't exist`;
+            });
+            const prompt = new TextPrompt(msg, usage, { limit: 3 });
+            const response = (await prompt.run('Please select the Track')) as number;
+            const dispatcher = await this.client.queue.handleTrack(node, ltr.tracks[response - 1], msg);
+            msg.send(`Added **${ltr.tracks[response - 1].info.title}** to the queue!`);
             if (dispatcher) await dispatcher.play();
         }
-
-        return msg.send('hmm');
     }
 }
