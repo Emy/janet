@@ -1,14 +1,17 @@
 type FilteredWordOptions = {
+    notify: boolean;
+    bypass: number;
     word: string;
-    priority: number;
 };
 
 export default class FilteredWord {
+    notify: boolean;
+    bypass: number;
     word: string;
-    priority: number;
 
     constructor(options: FilteredWordOptions) {
+        this.notify = options.notify;
+        this.bypass = options.bypass;
         this.word = options.word;
-        this.priority = options.priority;
     }
 }

@@ -19,22 +19,25 @@ export default class extends Command {
             nsfw: false,
             permissionLevel: 4,
             description: 'Views the list of filtered words.',
-            extendedHelp: '[optional: <0 | 1>] 0 = Silent Delete, 1 = Reported',
-            usage: '[prio:integer]',
-            usageDelim: undefined,
+            extendedHelp: '[show notify] [show only this bypass level]',
+            usage: '[notify:boolean] [bypass:integer]',
+            usageDelim: ' ',
             quotedStringSupport: false,
             subcommands: false,
         });
     }
 
-    async run(msg: KlasaMessage, [prio]: [number]) {
+    async run(msg: KlasaMessage, [notify, bypass]: [boolean, number]) {
         let content = 'Filterwords: ';
         msg.guild.settings.get('filter.words').forEach((fw: FilteredWord) => {
-            if (prio === undefined) content = content + `${fw.word} (${fw.priority}), `;
-            if (prio === fw.priority) content = content + `${fw.word} (${fw.priority}), `;
+            const output = `**${fw.word}** [${fw.notify} - ${fw.bypass}], `;
+
+            if (notify == undefined) content += output;
+
+            if (notify == fw.notify && bypass == undefined) content += output;
+            if (notify == fw.notify && bypass == fw.bypass) content += output;
         });
 
-        msg.delete();
         return msg.send(content);
     }
 }

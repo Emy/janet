@@ -23,15 +23,17 @@ export default class extends Monitor {
         if (!msg.guild.settings.get('filter.enableWordFiltering')) return;
 
         const content = ASCIIFolder.foldMaintaining(msg.content).toLowerCase();
-
         const filteredWords = [];
-        let highestPrio = -1;
-        msg.guild.settings.get('filter.words').forEach((filterWord) => {
-            if (!(content.indexOf(filterWord.word.toLowerCase()) > -1)) return;
+        let notify = false;
+
+        for (const filterWord of msg.guild.settings.get('filter.words')) {
+            if (!(content.indexOf(filterWord.word.toLowerCase()) > -1)) continue;
+            if (await msg.hasAtLeastPermissionLevel(filterWord.bypass)) continue;
+
             filteredWords.push(filterWord.word);
-            if (!(highestPrio < filterWord.priority)) return;
-            highestPrio = filterWord.priority;
-        });
+            if (filterWord.notify) notify = true;
+        }
+
         if (filteredWords.length === 0) return;
         const excludedChannels = msg.guild.settings.get('filter.excludedChannels');
         if (excludedChannels.some((excludedChannel) => msg.channel.id == excludedChannel)) return;
@@ -66,7 +68,8 @@ export default class extends Monitor {
             limiter.drip();
         }
 
-        if (highestPrio <= 0) return;
+        if (!notify) return;
+
         const membersToPing = [];
         msg.guild.roles.cache.get(msg.guild.settings.get('roles.moderator')).members.map((member) => {
             if (
@@ -92,8 +95,7 @@ export default class extends Monitor {
             .setThumbnail(msg.member.user.avatarURL({ format: 'jpg' }))
             .setColor('RED')
             .addField('Member', `${msg.member.user.tag} (<@${msg.member.user.id}>)`, true)
-            .addField('Priority', highestPrio, true)
-            .addField('Channel', `<#${msg.channel.id}>`)
+            .addField('Channel', `<#${msg.channel.id}>`, true)
             .addField('Message', msg.content)
 
             .setTimestamp();

@@ -26,7 +26,6 @@ export default class extends Command {
         await member.ban({ days: 1, reason: reason ? reason : 'No reason.' });
         const c = await this.buildCase(msg, reason, member.user);
         this.sendEmbed(msg, member, reason, c);
-        msg.delete();
     }
 
     async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser) {
@@ -52,7 +51,7 @@ export default class extends Command {
         const embed = new MessageEmbed()
             .setTitle('Member Banned')
             .setThumbnail(member.user.avatarURL({ format: 'jpg' }))
-            .setColor('RED')
+            .setColor('AQUA')
             .addField('Member', `${member.user.tag} (<@${member.id}>)`)
             .addField('Mod', `${msg.author.tag} (<@${msg.author.id}>)`)
             .addField('Reason', reason ? reason : 'No reason.')

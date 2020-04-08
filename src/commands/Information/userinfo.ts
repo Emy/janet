@@ -44,6 +44,5 @@ export default class extends Command {
             .setFooter(member.user.id)
             .setTimestamp();
         msg.send(embed);
-        msg.delete();
     }
 }
