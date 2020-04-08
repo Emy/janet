@@ -1,5 +1,5 @@
 import { Client, KlasaMessage } from 'klasa';
-import { ShoukakuSocket } from 'shoukaku';
+import { ShoukakuSocket, Track } from 'shoukaku';
 import Dispatcher from './dispatcher';
 
 export default class Queue extends Map {
@@ -10,7 +10,8 @@ export default class Queue extends Map {
         this.client = client;
     }
 
-    async handleTrack(node: ShoukakuSocket, track: string, msg: KlasaMessage) {
+    async handleTrack(node: ShoukakuSocket, track: Track, msg: KlasaMessage): Promise<Dispatcher | null> {
+        if (!track) return;
         let dispatcher = this.get(msg.guild.id);
         if (!dispatcher) {
             const player = await node.joinVoiceChannel({

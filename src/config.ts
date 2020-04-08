@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { KlasaClientOptions } from 'klasa';
 
 /**
@@ -20,21 +19,15 @@ export const config: KlasaClientOptions = {
     prefix: '!',
     // If custom settings should be preserved when a guild removes your bot
     preserveSettings: true,
-    // If your bot should be able to mention @everyone
-    disableEveryone: false,
-    // Whether d.js should queue your rest request in 'sequential' or 'burst' mode
-    apiRequestMethod: 'sequential',
     // The time in ms to add to ratelimits, to ensure you wont hit a 429 response
     restTimeOffset: 500,
-    // Any Websocket Events you don't want to listen to
-    disabledEvents: [],
     // A presence to login with
     presence: {},
 
     /**
      * Caching Options
      */
-    fetchAllMembers: false,
+    fetchAllMembers: true,
     messageCacheMaxSize: 200,
     messageCacheLifetime: 0,
     commandMessageLifetime: 1800,
@@ -91,7 +84,7 @@ export const config: KlasaClientOptions = {
             promptTime: 30000,
             requiredSettings: [],
             requiredPermissions: 0,
-            runIn: ['text', 'dm', 'group'],
+            runIn: ['text', 'dm'],
             subcommands: false,
             usage: '',
             quotedStringSupport: false,
@@ -103,7 +96,6 @@ export const config: KlasaClientOptions = {
         },
         extendables: {
             enabled: true,
-            klasa: false,
             appliesTo: [],
         },
         finalizers: { enabled: true },
@@ -122,8 +114,6 @@ export const config: KlasaClientOptions = {
         },
         providers: {
             enabled: true,
-            sql: false,
-            cache: false,
         },
         tasks: { enabled: true },
     },

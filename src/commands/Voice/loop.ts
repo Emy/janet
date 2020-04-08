@@ -1,9 +1,12 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
+import JanetClient from '../../lib/client';
+import Dispatcher from '../../util/dispatcher';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+    client: JanetClient;
+    constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: false,
+            enabled: true,
             runIn: ['text'],
             requiredPermissions: [],
             aliases: ['l'],
@@ -12,17 +15,19 @@ export default class extends Command {
         });
     }
 
-    async run(msg: KlasaMessage, [...params]) {
-        // if (!msg.checkVoicePermission()) return;
-        // const player = this.client.music.get(msg.guild.id);
-        // player.loop = !player.loop;
-        // const title = player.loop ? 'LOOPED' : 'UNLOOPED';
-        // const desc = player.loop ? 'LOOPED_DESCRIPTION' : 'UNLOOPED_DESCRIPTION';
-
-        // msg.sendEmbed(new MessageEmbed()
-        //     .setTitle(msg.language.get(title))
-        //     .setDescription(msg.language.get(desc)))
-
-        return null;
+    async run(msg: KlasaMessage) {
+        if (!(await msg.hasAtLeastPermissionLevel(5))) {
+            if (!msg.guild.settings.get('channels.botspam')) return;
+            if (msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+                return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+            }
+        }
+        const dispatcher = this.client.queue.get(msg.guild.id) as Dispatcher;
+        if (!dispatcher) return msg.send('No music playing in here.');
+        if (msg.member.voice.channel.id != dispatcher.player.voiceConnection.voiceChannelID) {
+            return msg.send('We need to be in the same voice channel.');
+        }
+        dispatcher.loop = !dispatcher.loop;
+        return msg.send(`Loop is: ${dispatcher.loop}`);
     }
 }

@@ -84,16 +84,12 @@ export default class extends Monitor {
         });
 
         const channelID = msg.guild.settings.get('channels.reports');
+        let toPing = '';
         if (membersToPing.length > 0) {
-            let content = '';
             membersToPing.forEach((member) => {
-                content += `<@${member.user.id}> `;
+                toPing += `<@${member.user.id}> `;
             });
-
-            const channel = this.client.channels.cache.get(channelID) as TextChannel;
-            channel.send(content);
         }
-        if (!channelID) return;
         const embed = new MessageEmbed()
             .setTitle('Word filter')
             .setThumbnail(msg.member.user.avatarURL({ format: 'jpg' }))
@@ -104,7 +100,7 @@ export default class extends Monitor {
 
             .setTimestamp();
         const channel = this.client.channels.cache.get(channelID) as TextChannel;
-        channel.send(embed);
+        channel.send(toPing, embed);
     }
 
     async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, duration: Date) {

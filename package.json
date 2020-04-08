@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A bot for the r/jb discord",
   "main": "dist/index.js",
-  "repository": "https://github.com/Emy/rjbBot",
+  "repository": "https://github.com/Emy/janet",
   "author": "Emy",
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -16,6 +16,7 @@
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
     "fold-to-ascii": "^5.0.0",
+    "ipswme": "^2.2.1",
     "klasa": "dirigeants/klasa",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",

@@ -6,7 +6,7 @@ export default class extends Serializer {
         super(client, store, file, dir);
     }
 
-    async deserialize(data, piece, language) {
+    async deserialize(data) {
         return new FilteredWord(data);
     }
 

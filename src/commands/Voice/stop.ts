@@ -1,9 +1,12 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
+import JanetClient from '../../lib/client';
+import Dispatcher from '../../util/dispatcher';
 
-module.exports = class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
+export default class extends Command {
+    client: JanetClient;
+    constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
         super(client, store, file, dir, {
-            enabled: false,
+            enabled: true,
             runIn: ['text'],
             requiredPermissions: ['EMBED_LINKS'],
             aliases: ['leave'],
@@ -12,17 +15,19 @@ module.exports = class extends Command {
         });
     }
 
-    async run(msg: KlasaMessage, [...paran]) {
-        // if (!msg.checkVoicePermission()) return;
-        // const lang = msg.language;
-        // const emojis = this.client.emojis.cache;
-        // const dispatcher = this.client.queue.get(msg.guild.id);
-        // dispatcher.onEvent();
-        // msg.genEmbed()
-        //     .setTitle(`${emojis.get(emoji.stop)} ${lang.get('STOP')}`)
-        //     .setDescription(lang.get('STOPPING'))
-        //     .send();
-
-        return null;
+    async run(msg: KlasaMessage) {
+        if (!(await msg.hasAtLeastPermissionLevel(5))) {
+            if (!msg.guild.settings.get('channels.botspam')) return;
+            if (msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+                return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+            }
+        }
+        const dispatcher = this.client.queue.get(msg.guild.id) as Dispatcher;
+        if (!dispatcher) return msg.send('No music playing in here.');
+        if (msg.member.voice.channel.id != dispatcher.player.voiceConnection.voiceChannelID) {
+            return msg.send('We need to be in the same voice channel.');
+        }
+        dispatcher.onEvent(undefined);
+        return msg.send('I am stopping the music.');
     }
-};
+}
