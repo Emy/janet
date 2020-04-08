@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { PermissionLevels } from 'klasa';
 import { config, token } from './config';
 import JanetClient from './lib/client';
