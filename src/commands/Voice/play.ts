@@ -27,7 +27,7 @@ export default class extends Command {
         }
         if (!msg.member.voice.channel) return msg.send('You are not in a VoiceChannel right now.');
         const node = this.client.shoukaku.getNode();
-        const tracks = await node.rest.resolve(encodeURIComponent(song), 'youtube');
+        const tracks = await node.rest.resolve(song, 'youtube');
         if (!tracks) return msg.send('No tracks found.');
         if (Array.isArray(tracks)) {
             const dispatcher = await this.client.queue.handleTrack(node, tracks.shift(), msg);
