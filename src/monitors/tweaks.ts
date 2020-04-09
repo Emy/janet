@@ -81,13 +81,14 @@ export default class extends Monitor {
     }
 
     async getCompatibilityData(tweak: { name: string; version: string }) {
+        const result = [];
         const response = await fetch(`https://jlippold.github.io/tweakCompatible/json/packages/${tweak.name}.json`);
+        if (response.status === 404) return result;
         const data = await response.json();
         const reports = data.versions.filter(
             (v: { tweakVersion: string; iOSVersion: string }) =>
                 v.tweakVersion === tweak.version && parseInt(v.iOSVersion.split('.')[0]) >= 11,
         );
-        const result = [];
         for (const report of reports) {
             result.push({
                 iOSVersion: report.iOSVersion,
