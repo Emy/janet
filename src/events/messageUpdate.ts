@@ -5,6 +5,8 @@ export default class extends Event {
     constructor(client: KlasaClient, store: EventStore, file: string[], dir: string) {
         super(client, store, file, dir, {
             enabled: true,
+            name: 'janetMessageUpdate',
+            event: 'messageUpdate',
         });
     }
 
