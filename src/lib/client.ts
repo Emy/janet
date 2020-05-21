@@ -46,6 +46,7 @@ export default class JanetClient extends KlasaClient {
                     folder.add('enableSpoilerFiltering', 'boolean', { default: true });
                 folder.add('words', 'filteredword', { array: true, configurable: false });
                 folder.add('excludedChannels', 'textchannel', { array: true });
+                folder.add('enableInviteFiltering', 'boolean', { default: false });
             })
             .add('logging', (folder) => {
                 folder.add('excludedChannels', 'textchannel', { array: true });
