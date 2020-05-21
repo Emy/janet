@@ -1,5 +1,6 @@
 // Copyright (c) 2017-2019 dirigeants. All rights reserved. MIT license.
 import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
+import { TextChannel } from 'discord.js';
 
 export default class extends Command {
     constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
@@ -23,7 +24,7 @@ export default class extends Command {
             messages = messages.filter(this.getFilter(msg, type, user));
         }
         const messageArray = messages.array().slice(0, limit);
-        await msg.channel.bulkDelete(messageArray);
+        await (msg.channel as TextChannel).bulkDelete(messageArray);
         const res = (await msg.send(
             `Successfully deleted ${messageArray.length} messages from ${limit}.`,
         )) as KlasaMessage;

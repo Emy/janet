@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import { Command, CommandStore, KlasaClient, KlasaMessage, TextPrompt, Usage } from 'klasa';
-import { LoadTrackResponse } from 'shoukaku';
+import { ShoukakuTrackList } from 'shoukaku';
 import JanetClient from '../../lib/client';
 
 export default class extends Command {
@@ -40,7 +40,7 @@ export default class extends Command {
         }
 
         // Should be a LoadTrackResponse at this point.
-        const ltr = tracks as LoadTrackResponse;
+        const ltr = tracks as ShoukakuTrackList;
         if (Array.isArray(ltr.tracks)) {
             ltr.tracks = ltr.tracks.slice(0, 5);
             const embed = new MessageEmbed()
