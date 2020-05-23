@@ -13,11 +13,11 @@
     "dev": "yarn lint && yarn build && yarn start"
   },
   "dependencies": {
-    "discord.js": "discordjs/discord.js",
+    "discord.js": "discordjs/discord.js#fe7df708e44e0280dfaf0f8e457b154781bb5140",
     "dotenv": "^8.2.0",
     "fold-to-ascii": "^5.0.0",
     "ipswme": "^2.2.1",
-    "klasa": "dirigeants/klasa",
+    "klasa": "dirigeants/klasa#settings",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
     "pg": "^8.0.0",
