@@ -13,6 +13,8 @@
     "dev": "yarn lint && yarn build && yarn start"
   },
   "dependencies": {
+    "@klasa/querybuilder": "^0.0.1",
+    "@klasa/utils": "^0.0.5",
     "discord.js": "discordjs/discord.js#fe7df708e44e0280dfaf0f8e457b154781bb5140",
     "dotenv": "^8.2.0",
     "fold-to-ascii": "^5.0.0",
