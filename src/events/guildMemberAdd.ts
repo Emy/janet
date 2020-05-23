@@ -1,10 +1,11 @@
 import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import ASCIIFolder from 'fold-to-ascii';
-import { Event, EventStore, KlasaClient } from 'klasa';
+import { Event, EventStore } from 'klasa';
+import FilteredWord from '../util/filteredWord';
 
 export default class extends Event {
-    constructor(client: KlasaClient, store: EventStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: EventStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             once: false,
         });
@@ -14,14 +15,14 @@ export default class extends Event {
         if (member.guild.settings.get('filter.enableWordFiltering')) {
             const nick = ASCIIFolder.foldMaintaining(member.displayName).toLowerCase();
 
-            for (const filteredWord of member.guild.settings.get('filter.words')) {
+            for (const filteredWord of member.guild.settings.get('filter.words') as FilteredWord[]) {
                 if (!nick.includes(filteredWord.word.toLowerCase())) continue;
                 member.setNickname('change name pls', 'filtered word');
             }
         }
 
         if (member.guild.settings.get('roles.member')) {
-            member.roles.add(member.guild.settings.get('roles.member'));
+            member.roles.add(member.guild.settings.get('roles.member') as string);
         }
 
         let channelID = member.guild.settings.get('channels.private');
@@ -37,13 +38,13 @@ export default class extends Event {
             .addField('Created', member.user.createdAt)
             .setTimestamp()
             .setFooter(member.user.id);
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         channel.send(embed);
 
         channelID = member.guild.settings.get('channels.reports');
         if (!channelID) return;
         if (member.user.settings.get('isMuted')) {
-            await member.roles.add(member.guild.settings.get('roles.muted'));
+            await member.roles.add(member.guild.settings.get('roles.muted') as string);
             embed.setTitle('Mute Evasion').setColor('RED');
 
             channel.send(embed);

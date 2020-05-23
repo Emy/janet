@@ -1,12 +1,12 @@
 import { MessageEmbed } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage, TextPrompt, Usage } from 'klasa';
+import { Command, CommandStore, KlasaMessage, TextPrompt, Usage, KlasaClient } from 'klasa';
 import { ShoukakuTrackList } from 'shoukaku';
 import JanetClient from '../../lib/client';
 
 export default class extends Command {
     client: JanetClient;
     constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+        super(store, file, dir, {
             enabled: true,
             runIn: ['text'],
             requiredPermissions: ['EMBED_LINKS'],

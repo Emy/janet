@@ -11,33 +11,35 @@ config.permissionLevels = new PermissionLevels()
         ({ guild, member }) =>
             guild &&
             guild.settings.get('roles.memberplus') &&
-            member.roles.cache.has(guild.settings.get('roles.memberplus')),
+            member.roles.has(guild.settings.get('roles.memberplus') as string),
     )
     .add(
         2,
         ({ guild, member }) =>
             guild &&
             guild.settings.get('roles.memberpro') &&
-            member.roles.cache.has(guild.settings.get('roles.memberpro')),
+            member.roles.has(guild.settings.get('roles.memberpro') as string),
     )
     .add(
         3,
         ({ guild, member }) =>
             guild &&
             guild.settings.get('roles.memberedition') &&
-            member.roles.cache.has(guild.settings.get('roles.memberedition')),
+            member.roles.has(guild.settings.get('roles.memberedition') as string),
     )
     .add(
         4,
         ({ guild, member }) =>
-            guild && guild.settings.get('roles.genius') && member.roles.cache.has(guild.settings.get('roles.genius')),
+            guild &&
+            guild.settings.get('roles.genius') &&
+            member.roles.has(guild.settings.get('roles.genius') as string),
     )
     .add(
         5,
         ({ guild, member }) =>
             guild &&
             guild.settings.get('roles.moderator') &&
-            member.roles.cache.has(guild.settings.get('roles.moderator')),
+            member.roles.has(guild.settings.get('roles.moderator') as string),
     )
     // Members of guilds must have 'MANAGE_GUILD' permission
     .add(6, ({ guild, member }) => guild && member.permissions.has('MANAGE_GUILD'), { fetch: true })
@@ -47,8 +49,8 @@ config.permissionLevels = new PermissionLevels()
      * Allows the Bot Owner to use any lower commands
      * and causes any command with a permission level 9 or lower to return an error if no check passes.
      */
-    .add(9, ({ author, client }) => author === client.owner, { break: true })
+    .add(9, ({ author, client }) => client.owners.has(author), { break: true })
     // Allows the bot owner to use Bot Owner only commands, which silently fail for other users.
-    .add(10, ({ author, client }) => author === client.owner);
+    .add(10, ({ author, client }) => client.owners.has(author));
 
 new JanetClient(config).login(token);

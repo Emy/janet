@@ -1,10 +1,10 @@
 import { GuildMember } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
+import { Command, CommandStore, KlasaMessage, KlasaUser } from 'klasa';
 import Case from '../../util/case';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: false,
             runIn: ['text'],
             requiredPermissions: [],
@@ -29,7 +29,7 @@ export default class extends Command {
     }
 
     async run(msg: KlasaMessage, [member, points, reason]: [GuildMember, number, string]) {
-        if (member.user.settings.get('warnPoints') < points) points = member.user.settings.get('warnPoints');
+        if (member.user.settings.get('warnPoints') < points) points = member.user.settings.get('warnPoints') as number;
         await member.user.settings.update('warnPoints', points * -1);
         this.buildCase(msg, reason, points, member.user);
 
@@ -38,7 +38,7 @@ export default class extends Command {
 
     async buildCase(msg: KlasaMessage, reason: string, points: number, user: KlasaUser) {
         const c = new Case({
-            id: this.client.settings.get('caseID'),
+            id: this.client.settings.get('caseID') as number,
             type: 'LIFTWARN',
             date: Date.now(),
             until: undefined,
@@ -46,10 +46,10 @@ export default class extends Command {
             modTag: msg.author.tag,
             reason: reason,
             punishment: points,
-            currentWarnPoints: user.settings.get('warnPoints'),
+            currentWarnPoints: user.settings.get('warnPoints') as number,
         });
-        await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
-        await user.settings.update('cases', c, { action: 'add' });
+        await this.client.settings.update('caseID', (this.client.settings.get('caseID') as number) + 1);
+        await user.settings.update('cases', c, { arrayAction: 'add' });
         return c;
     }
 }

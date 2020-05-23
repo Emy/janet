@@ -1,11 +1,11 @@
 import { MessageEmbed } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser, RichDisplay } from 'klasa';
+import { Command, CommandStore, KlasaMessage, KlasaUser, RichDisplay } from 'klasa';
 import moment from 'moment';
 import Case from '../../util/case';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             runIn: ['text'],
             requiredPermissions: [],
@@ -34,7 +34,7 @@ export default class extends Command {
         let counter = 0;
         let embed = new MessageEmbed();
         await user.settings.sync();
-        user.settings.get('cases').forEach((c: Case) => {
+        (user.settings.get('cases') as Case[]).forEach((c: Case) => {
             embed.addField(
                 `#${c.id} ${c.type} - Mod: ${c.modTag} Reason: ${c.reason} Punishment: ${c.punishment}`,
                 `At: ${moment(new Date(c.date).toISOString()).format('LL')}`,

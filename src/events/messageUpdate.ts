@@ -1,9 +1,9 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
-import { Event, EventStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Event, EventStore, KlasaMessage } from 'klasa';
 
 export default class extends Event {
-    constructor(client: KlasaClient, store: EventStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: EventStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             name: 'janetMessageUpdate',
             event: 'messageUpdate',
@@ -16,7 +16,7 @@ export default class extends Event {
         if (oldMsg.content === newMsg.content) return;
         const channelID = oldMsg.guild.settings.get('channels.private');
         if (!channelID) return;
-        for (const channel of oldMsg.guild.settings.get('logging.excludedChannels')) {
+        for (const channel of oldMsg.guild.settings.get('logging.excludedChannels') as string[]) {
             if (oldMsg.channel.id === channel) return;
         }
         const embed = new MessageEmbed()
@@ -29,7 +29,7 @@ export default class extends Event {
             .addField('Channel', `<#${oldMsg.channel.id}>`)
             .setTimestamp();
 
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         channel.send(embed);
     }
 }

@@ -1,4 +1,4 @@
-import { Client, KlasaClient, KlasaClientOptions } from 'klasa';
+import { Client, KlasaClientOptions } from 'klasa';
 import { Shoukaku } from 'shoukaku';
 import Queue from '../util/queue';
 
@@ -19,12 +19,12 @@ const shoukakuNodes = [
     },
 ];
 
-export default class JanetClient extends KlasaClient {
+export default class JanetClient extends Client {
     shoukaku: Shoukaku;
     queue: Queue;
     constructor(options: KlasaClientOptions) {
         super(options);
-        Client.defaultClientSchema.add('caseID', 'integer', { default: 0, min: 0, configurable: false });
+        Client.defaultClientSchema.add('caseID', 'integer', { default: 0, minimum: 0, configurable: false });
         Client.defaultGuildSchema
             .add('roles', (folder) => {
                 folder.add('muted', 'role');
@@ -56,9 +56,9 @@ export default class JanetClient extends KlasaClient {
             .add('clem', 'boolean', { default: false, configurable: false })
             .add('xpFrozen', 'boolean', { default: false, configurable: false })
             .add('warnKicked', 'boolean', { default: false, configurable: false })
-            .add('warnPoints', 'integer', { default: 0, min: 0, configurable: false })
-            .add('xp', 'integer', { default: 0, min: 0, configurable: false })
-            .add('level', 'integer', { default: 0, min: 0, configurable: false })
+            .add('warnPoints', 'integer', { default: 0, minimum: 0, configurable: false })
+            .add('xp', 'integer', { default: 0, minimum: 0, configurable: false })
+            .add('level', 'integer', { default: 0, minimum: 0, configurable: false })
             .add('cases', 'any', { array: true, configurable: false })
             .add('offlineReportPing', 'boolean', { default: false, configurable: false });
         this.shoukaku = new Shoukaku(this, shoukakuNodes, shoukakuConfig);

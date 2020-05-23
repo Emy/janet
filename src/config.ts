@@ -12,13 +12,12 @@ export const config: KlasaClientOptions = {
      */
     // Disables/Enables a process.on('unhandledRejection'...) handler
     production: false,
-    ownerID: process.env.OWNER_ID,
+    owners: [process.env.OWNER_ID],
     // The default language that comes with klasa. More base languages can be found on Klasa-Pieces
     language: 'en-US',
     // The default configurable prefix for each guild
     prefix: '!',
     // If custom settings should be preserved when a guild removes your bot
-    preserveSettings: true,
     // The time in ms to add to ratelimits, to ensure you wont hit a 429 response
     restTimeOffset: 500,
     // A presence to login with
@@ -128,15 +127,6 @@ export const config: KlasaClientOptions = {
         verbose: false,
         warn: true,
         wtf: true,
-    },
-
-    /**
-     * Custom Setting Gateway Options
-     */
-    gateways: {
-        guilds: {},
-        users: {},
-        clientStorage: {},
     },
 };
 export const token = process.env.DISCORD_TOKEN;

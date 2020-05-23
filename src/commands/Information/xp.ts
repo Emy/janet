@@ -1,9 +1,9 @@
 import { MessageEmbed } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
+import { Command, CommandStore, KlasaMessage, KlasaUser } from 'klasa';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             runIn: ['text'],
             requiredPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
@@ -26,7 +26,7 @@ export default class extends Command {
         }
         if (!user) user = msg.author;
 
-        const leaderboard = this.client.users.cache
+        const leaderboard = this.client.users
             .sort((a, b) => {
                 if (a.settings.get('xp') > b.settings.get('xp')) return -1;
                 if (a.settings.get('xp') < b.settings.get('xp')) return 1;
@@ -48,7 +48,9 @@ export default class extends Command {
             .addField('Level', user.settings.get('level'), true)
             .addField(
                 'XP',
-                `${user.settings.get('xp')}/${this.getRemainingXPForNextLevel(user.settings.get('level') + 1)}`,
+                `${user.settings.get('xp')}/${this.getRemainingXPForNextLevel(
+                    (user.settings.get('level') as number) + 1,
+                )}`,
                 true,
             )
             .addField('Rank', `${rank} / ${leaderboard.length}`, true)

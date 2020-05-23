@@ -1,9 +1,9 @@
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
 import FilteredWord from '../../util/filteredWord';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             runIn: ['text', 'dm'],
             requiredPermissions: [],
@@ -29,7 +29,7 @@ export default class extends Command {
 
     async run(msg: KlasaMessage, [notify, bypass]: [boolean, number]) {
         let content = 'Filterwords: ';
-        msg.guild.settings.get('filter.words').forEach((fw: FilteredWord) => {
+        (msg.guild.settings.get('filter.words') as FilteredWord[]).forEach((fw: FilteredWord) => {
             const output = `**${fw.word}** [${fw.notify} - ${fw.bypass}], `;
 
             if (notify == undefined) content += output;

@@ -6,7 +6,7 @@ import Dispatcher from '../util/dispatcher';
 export default class extends Event {
     client: JanetClient;
     constructor(client: JanetClient, store: EventStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+        super(store, file, dir, {
             enabled: true,
             once: false,
         });
@@ -16,7 +16,7 @@ export default class extends Event {
         if (!(oldMember && newMember)) return;
         const dispatcher = this.client.queue.get(oldMember.guild.id) as Dispatcher;
         if (!dispatcher) return;
-        const voiceChannel = oldMember.guild.channels.cache.get(dispatcher.player.voiceConnection.voiceChannelID);
+        const voiceChannel = oldMember.guild.channels.get(dispatcher.player.voiceConnection.voiceChannelID);
         if (voiceChannel.members.size === 1) dispatcher.onEvent(undefined);
     }
 }

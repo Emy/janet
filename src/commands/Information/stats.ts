@@ -1,9 +1,9 @@
 import { MessageEmbed } from 'discord.js';
-import { Command, CommandStore, Duration, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, Duration, KlasaMessage } from 'klasa';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             guarded: true,
             description: (language) => language.get('COMMAND_STATS_DESCRIPTION'),
@@ -21,7 +21,7 @@ export default class extends Command {
 
         if (this.client.shard) {
             const results = await this.client.shard.broadcastEval(
-                `[this.users.cache.size, (process.memoryUsage().heapUsed / 1024 / 1024)]`,
+                `[this.users.size, (process.memoryUsage().heapUsed / 1024 / 1024)]`,
             );
             for (const result of results) {
                 users += result[0];
@@ -33,7 +33,7 @@ export default class extends Command {
             .setTitle('Statistics')
             .setThumbnail(this.client.user.avatarURL({ format: 'jpg' }))
             .setColor('GREEN')
-            .addField('Users', users || this.client.users.cache.size, true)
+            .addField('Users', users || this.client.users.size, true)
             .addField('Memory', `${(memory || process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`, true)
             .addField('Uptime', Duration.toNow(Date.now() - process.uptime() * 1000), true)
             .setTimestamp();

@@ -15,6 +15,14 @@ type DeviceCategory = 'iPhone' | 'iPod' | 'iPad' | 'AppleTV' | 'AppleWatch' | 'H
 
 const chunkSize = 20;
 
+function chunk<T>(arr: T[], len: number): T[][] {
+    const chunks = [];
+    for (let i = 0; i < arr.length; i += len) {
+        chunks.push(arr.slice(i, i + len));
+    }
+    return chunks;
+}
+
 export default class extends Command {
     description = 'List devices';
     aliases = ['list'];
@@ -72,12 +80,4 @@ export default class extends Command {
             return prev;
         }, {});
     }
-}
-
-function chunk<T>(arr: T[], len: number): T[][] {
-    const chunks = [];
-    for (let i = 0; i < arr.length; i += len) {
-        chunks.push(arr.slice(i, i + len));
-    }
-    return chunks;
 }

@@ -1,9 +1,9 @@
 import { TextChannel } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, KlasaMessage } from 'klasa';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: false,
             runIn: ['text'],
             requiredPermissions: [],
@@ -28,7 +28,7 @@ export default class extends Command {
     }
 
     async run(msg: KlasaMessage) {
-        const everyone = msg.guild.roles.cache.first();
+        const everyone = msg.guild.roles.first();
         const channel = msg.channel as TextChannel;
         const isLocked = channel.permissionsFor(everyone).has('SEND_MESSAGES');
 

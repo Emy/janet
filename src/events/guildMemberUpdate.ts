@@ -1,12 +1,11 @@
-import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
+import { GuildMember, MessageEmbed, TextChannel, Collection, Role } from 'discord.js';
 import ASCIIFolder from 'fold-to-ascii';
 import { Event, EventStore } from 'klasa';
-import JanetClient from '../lib/client';
+import FilteredWord from '../util/filteredWord';
 
 export default class extends Event {
-    client: JanetClient;
-    constructor(client: JanetClient, store: EventStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: EventStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             once: false,
         });
@@ -15,7 +14,7 @@ export default class extends Event {
     async run(oldMember: GuildMember, newMember: GuildMember) {
         if (!(oldMember || newMember)) return;
         if (oldMember.nickname != newMember.nickname) return this.nickNameChange(oldMember, newMember);
-        if (newMember.roles.cache.size != oldMember.roles.cache.size) return this.roleChange(oldMember, newMember);
+        if (newMember.roles.size != oldMember.roles.size) return this.roleChange(oldMember, newMember);
     }
 
     nickNameChange(oldMember: GuildMember, newMember: GuildMember) {
@@ -25,7 +24,7 @@ export default class extends Event {
         const nick = ASCIIFolder.foldMaintaining(newMember.displayName).toLowerCase();
 
         if (oldMember.guild.settings.get('filter.enableWordFiltering')) {
-            for (const filteredWord of oldMember.guild.settings.get('filter.words')) {
+            for (const filteredWord of oldMember.guild.settings.get('filter.words') as FilteredWord[]) {
                 if (!nick.includes(filteredWord.word.toLowerCase())) continue;
                 newMember.setNickname('change name pls', 'filtered word');
             }
@@ -41,20 +40,19 @@ export default class extends Event {
             .setFooter(oldMember.user.id)
             .setTimestamp();
 
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         channel.send(embed);
     }
 
     roleChange(oldMember: GuildMember, newMember: GuildMember) {
         const channelID = oldMember.guild.settings.get('channels.private');
         if (!channelID) return;
-        const newRole = newMember.roles.cache.difference(oldMember.roles.cache);
+        const newRole = newMember.roles.difference((oldMember.roles as unknown) as Collection<string, Role>);
 
-        newRole.delete(newMember.guild.settings.get('roles.member'));
+        newRole.delete(newMember.guild.settings.get('roles.member') as string);
         if (newRole.size < 1) return;
 
-        const embedTitle =
-            newMember.roles.cache.size > oldMember.roles.cache.size ? 'Member Role Added' : 'Member Role Removed';
+        const embedTitle = newMember.roles.size > oldMember.roles.size ? 'Member Role Added' : 'Member Role Removed';
 
         const embed = new MessageEmbed()
             .setTitle(embedTitle)
@@ -65,7 +63,7 @@ export default class extends Event {
             .setFooter(oldMember.user.id)
             .setTimestamp();
 
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         channel.send(embed);
     }
 }

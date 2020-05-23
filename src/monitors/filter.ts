@@ -1,13 +1,14 @@
 import { Collection, GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import ASCIIFolder from 'fold-to-ascii';
-import { Duration, KlasaClient, KlasaMessage, KlasaUser, Monitor, MonitorStore, RateLimit } from 'klasa';
+import { Duration, KlasaMessage, KlasaUser, Monitor, MonitorStore, RateLimit } from 'klasa';
 import Case from '../util/case';
+import FilteredWord from '../util/filteredWord';
 
 export default class extends Monitor {
     ratelimits: Collection<string, RateLimit>;
 
-    constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: MonitorStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             ignoreBots: false,
             ignoreSelf: true,
@@ -26,7 +27,7 @@ export default class extends Monitor {
         const filteredWords = [];
         let notify = false;
 
-        for (const filterWord of msg.guild.settings.get('filter.words')) {
+        for (const filterWord of msg.guild.settings.get('filter.words') as FilteredWord[]) {
             if (!(content.indexOf(filterWord.word.toLowerCase()) > -1)) continue;
             if (await msg.hasAtLeastPermissionLevel(filterWord.bypass)) continue;
 
@@ -35,7 +36,7 @@ export default class extends Monitor {
         }
 
         if (filteredWords.length === 0) return;
-        const excludedChannels = msg.guild.settings.get('filter.excludedChannels');
+        const excludedChannels = msg.guild.settings.get('filter.excludedChannels') as string[];
         if (excludedChannels.some((excludedChannel) => msg.channel.id == excludedChannel)) return;
 
         await msg.delete();
@@ -46,8 +47,8 @@ export default class extends Monitor {
 
         const limiter = this.ratelimits.get(msg.author.id);
 
-        if (limiter.limited && !msg.member.roles.cache.has(msg.guild.settings.get('roles.muted'))) {
-            await msg.member.roles.add(msg.guild.settings.get('roles.muted'));
+        if (limiter.limited && !msg.member.roles.has(msg.guild.settings.get('roles.muted') as string)) {
+            await msg.member.roles.add(msg.guild.settings.get('roles.muted') as string);
             await msg.member.user.settings.update('isMuted', true);
 
             const d = new Date();
@@ -71,7 +72,7 @@ export default class extends Monitor {
         if (!notify) return;
 
         const membersToPing = [];
-        msg.guild.roles.cache.get(msg.guild.settings.get('roles.moderator')).members.map((member) => {
+        msg.guild.roles.get(msg.guild.settings.get('roles.moderator') as string).members.map((member) => {
             if (
                 !(
                     member.presence.status === 'online' ||
@@ -99,13 +100,13 @@ export default class extends Monitor {
             .addField('Message', msg.content)
 
             .setTimestamp();
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         channel.send(toPing, embed);
     }
 
     async buildCase(msg: KlasaMessage, reason: string, user: KlasaUser, duration: Date) {
         const c = new Case({
-            id: this.client.settings.get('caseID'),
+            id: this.client.settings.get('caseID') as number,
             type: 'MUTE',
             date: Date.now(),
             until: duration,
@@ -113,10 +114,10 @@ export default class extends Monitor {
             modTag: msg.author.tag,
             reason: reason,
             punishment: duration ? Duration.toNow(duration) : 'PERMANENT',
-            currentWarnPoints: user.settings.get('warnPoints'),
+            currentWarnPoints: user.settings.get('warnPoints') as number,
         });
-        await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
-        await user.settings.update('cases', c, { action: 'add' });
+        await this.client.settings.update('caseID', (this.client.settings.get('caseID') as number) + 1);
+        await user.settings.update('cases', c, { arrayAction: 'add' });
         return c;
     }
 
@@ -134,7 +135,7 @@ export default class extends Monitor {
             .setFooter(`Case #${c.id} | ${member.id}`)
             .setTimestamp();
 
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         return channel.send(embed);
     }
 }

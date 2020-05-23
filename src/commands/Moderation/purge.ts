@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2019 dirigeants. All rights reserved. MIT license.
-import { Command, CommandStore, KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
+import { Command, CommandStore, KlasaMessage, KlasaUser } from 'klasa';
 import { TextChannel } from 'discord.js';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             permissionLevel: 5,
             requiredPermissions: ['MANAGE_MESSAGES'],
             runIn: ['text'],

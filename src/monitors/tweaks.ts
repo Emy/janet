@@ -1,10 +1,10 @@
 import { MessageEmbed } from 'discord.js';
-import { KlasaClient, KlasaMessage, Monitor, MonitorStore, RichDisplay } from 'klasa';
+import { KlasaMessage, Monitor, MonitorStore, RichDisplay } from 'klasa';
 import fetch from 'node-fetch';
 
 export default class extends Monitor {
-    constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: MonitorStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             ignoreBots: true,
             ignoreSelf: true,

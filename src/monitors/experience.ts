@@ -1,8 +1,8 @@
-import { KlasaClient, KlasaMessage, Monitor, MonitorStore } from 'klasa';
+import { KlasaMessage, Monitor, MonitorStore } from 'klasa';
 
 export default class extends Monitor {
-    constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: MonitorStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             ignoreBots: true,
             ignoreSelf: true,
@@ -17,20 +17,20 @@ export default class extends Monitor {
         if (message.author.settings.get('xpFrozen')) return;
         const gainedXP = Math.floor(Math.random() * 10 + 1);
         //if (message.member.lastMessage.content === message.content) gainedXP = gainedXP * -1;
-        const currentXP = message.author.settings.get('xp');
+        const currentXP = message.author.settings.get('xp') as number;
         await message.author.settings.update('xp', currentXP + gainedXP);
         await message.author.settings.update('level', this.getLevel(currentXP + gainedXP));
 
         if (message.author.settings.get('level') >= 15 && message.guild.settings.get('roles.memberplus')) {
-            await message.member.roles.add(message.guild.settings.get('roles.memberplus'));
+            await message.member.roles.add(message.guild.settings.get('roles.memberplus') as string);
         }
 
         if (message.author.settings.get('level') >= 30 && message.guild.settings.get('roles.memberpro')) {
-            await message.member.roles.add(message.guild.settings.get('roles.memberpro'));
+            await message.member.roles.add(message.guild.settings.get('roles.memberpro') as string);
         }
 
         if (message.author.settings.get('level') >= 50 && message.guild.settings.get('roles.memberedition')) {
-            await message.member.roles.add(message.guild.settings.get('roles.memberedition'));
+            await message.member.roles.add(message.guild.settings.get('roles.memberedition') as string);
         }
     }
 

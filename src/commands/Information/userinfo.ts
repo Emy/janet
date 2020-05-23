@@ -1,9 +1,9 @@
 import { GuildMember, MessageEmbed } from 'discord.js';
-import { Command, CommandStore, KlasaClient, KlasaMessage, Timestamp } from 'klasa';
+import { Command, CommandStore, KlasaMessage, Timestamp } from 'klasa';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             runIn: ['text'],
             requiredPermissions: [],
@@ -24,7 +24,7 @@ export default class extends Command {
         if (!member) member = msg.member;
 
         let roles = '';
-        member.roles.cache.map((r) => (r.name != '@everyone' ? (roles += `${r} `) : ''));
+        member.roles.map((r) => (r.name != '@everyone' ? (roles += `${r} `) : ''));
 
         const timestamp = new Timestamp('LLL');
 

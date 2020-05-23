@@ -1,5 +1,5 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
-import { KlasaClient, Task, TaskStore } from 'klasa';
+import { Task, TaskStore } from 'klasa';
 import Case from '../util/case';
 
 type unmuteData = {
@@ -8,22 +8,22 @@ type unmuteData = {
 };
 
 export default class extends Task {
-    constructor(client: KlasaClient, store: TaskStore, file: string[], dir: string) {
-        super(client, store, file, dir, { enabled: true });
+    constructor(store: TaskStore, file: string[], dir: string) {
+        super(store, file, dir, { enabled: true });
     }
 
     async run(data: unmuteData) {
-        const guild = this.client.guilds.cache.get(data.guildID);
+        const guild = this.client.guilds.get(data.guildID);
         if (!guild) return;
-        const member = guild.members.cache.get(data.memberID);
+        const member = guild.members.get(data.memberID);
         if (!member) return;
 
-        if (!member.roles.cache.has(guild.settings.get('roles.muted'))) return;
-        await member.roles.remove(guild.settings.get('roles.muted'));
+        if (!member.roles.has(guild.settings.get('roles.muted') as string)) return;
+        await member.roles.remove(guild.settings.get('roles.muted') as string);
         await member.user.settings.update('isMuted', false);
 
         const c = new Case({
-            id: this.client.settings.get('caseID'),
+            id: this.client.settings.get('caseID') as number,
             type: 'UNMUTE',
             date: Date.now(),
             until: undefined,
@@ -31,12 +31,12 @@ export default class extends Task {
             modTag: this.client.user.tag,
             reason: 'Temporary mute expired!',
             punishment: undefined,
-            currentWarnPoints: member.user.settings.get('warnPoints'),
+            currentWarnPoints: member.user.settings.get('warnPoints') as number,
         });
-        await this.client.settings.update('caseID', this.client.settings.get('caseID') + 1);
-        await member.user.settings.update('cases', c, { action: 'add' });
+        await this.client.settings.update('caseID', (this.client.settings.get('caseID') as number) + 1);
+        await member.user.settings.update('cases', c, { arrayAction: 'add' });
 
-        const channelID = guild.settings.get('channels.public');
+        const channelID = guild.settings.get('channels.public') as string;
         if (!channelID) return;
         const embed = new MessageEmbed()
             .setTitle('Member Unmuted')
@@ -48,7 +48,7 @@ export default class extends Task {
             .setFooter(`Case #${c.id} | ${member.id}`)
             .setTimestamp();
 
-        const channel = this.client.channels.cache.get(channelID) as TextChannel;
+        const channel = this.client.channels.get(channelID as string) as TextChannel;
         channel.send(embed);
 
         return null;
