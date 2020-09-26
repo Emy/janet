@@ -20,6 +20,13 @@ export default class extends Command {
     aliases = ['list'];
 
     async run(msg: KlasaMessage) {
+        if (!(await msg.hasAtLeastPermissionLevel(5))) {
+            if (!msg.guild.settings.get('channels.botspam')) return;
+            if (msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+                return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+            }
+        }
+        
         const waitMsg = await msg.reply('Please wait...');
         const display = new RichDisplay();
         display.setFooterSuffix(` - Requested by ${msg.author.tag}`);
