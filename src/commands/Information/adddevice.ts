@@ -33,6 +33,13 @@ export default class extends Command {
     }
 
     async run(msg: KlasaMessage, [device]: [IDevice]) {
+        if (!(await msg.hasAtLeastPermissionLevel(5))) {
+            if (!msg.guild.settings.get('channels.botspam')) return;
+            if (msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+                return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+            }
+        }
+        
         if (msg.member!.nickname && /^.+ \[.+\,.+\]$/.test(msg.member!.nickname!)) {
             return msg.reply('device already set') as Promise<KlasaMessage>;
         }
