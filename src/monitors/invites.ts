@@ -5,7 +5,7 @@ export default class extends Monitor {
         super(store, file, dir, {
             enabled: true,
             ignoreBots: true,
-            ignoreSelf: true,
+            ignoreSelf: false,
             ignoreOthers: false,
             ignoreWebhooks: true,
             ignoreEdits: false,
@@ -14,9 +14,9 @@ export default class extends Monitor {
 
     async run(msg: KlasaMessage) {
         if (!msg.guildSettings.get('filter.enableInviteFiltering')) return;
-        const regex = new RegExp(/discord.gg\/(.*).*/m);
+        const regex = /(https?:\/\/)?(www\.)?(discord\.(gg|li|me|io)|discordapp\.com\/invite)\/(.+)/;
         const matches = regex.exec(msg.content);
         if (!matches) return;
-        if (matches[1].toLowerCase() !== 'jb') return msg.delete()
+        if (matches[5].toLowerCase() !== 'jb') return msg.delete()
     }
 }
