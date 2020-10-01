@@ -12,7 +12,7 @@ export const config: KlasaClientOptions = {
      */
     // Disables/Enables a process.on('unhandledRejection'...) handler
     production: false,
-    ownerID: process.env.OWNER_ID,
+    owners: [process.env.OWNER_ID],
     // The default language that comes with klasa. More base languages can be found on Klasa-Pieces
     language: 'en-US',
     // The default configurable prefix for each guild
