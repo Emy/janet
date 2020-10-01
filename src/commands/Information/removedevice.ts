@@ -9,6 +9,13 @@ export default class extends Command {
     }
 
     async run(msg: KlasaMessage) {
+        if (!(await msg.hasAtLeastPermissionLevel(5))) {
+            if (!msg.guild.settings.get('channels.botspam')) return;
+            if (msg.channel.id != msg.guild.settings.get('channels.botspam')) {
+                return msg.send(`Command only allowed in <#${msg.guild.settings.get('channels.botspam')}>`);
+            }
+        }
+        
         if (!/^.+ \[.+\,.+\]$/.test(msg.member!.nickname!)) {
             return msg.reply('no device set') as Promise<KlasaMessage>;
         }
