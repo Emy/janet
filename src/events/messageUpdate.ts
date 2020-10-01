@@ -1,9 +1,9 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
-import { Event, EventStore, KlasaClient, KlasaMessage } from 'klasa';
+import { Event, EventStore, KlasaMessage } from 'klasa';
 
 export default class extends Event {
-    constructor(client: KlasaClient, store: EventStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: EventStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             name: 'janetMessageUpdate',
             event: 'messageUpdate',

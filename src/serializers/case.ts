@@ -1,9 +1,9 @@
-import { KlasaClient, Serializer, SerializerStore } from 'klasa';
+import { Serializer, SerializerStore } from 'klasa';
 import Case from '../util/case';
 
 export default class extends Serializer {
-    constructor(client: KlasaClient, store: SerializerStore, file: string[], dir: string) {
-        super(client, store, file, dir);
+    constructor(store: SerializerStore, file: string[], dir: string) {
+        super(store, file, dir);
     }
 
     async deserialize(data) {

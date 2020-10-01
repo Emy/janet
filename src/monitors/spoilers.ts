@@ -1,8 +1,8 @@
-import { KlasaClient, KlasaMessage, Monitor, MonitorStore } from 'klasa';
+import { KlasaMessage, Monitor, MonitorStore } from 'klasa';
 
 export default class extends Monitor {
-    constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: MonitorStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             ignoreBots: true,
             ignoreSelf: false,

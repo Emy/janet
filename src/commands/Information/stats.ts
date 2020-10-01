@@ -1,9 +1,9 @@
 import { MessageEmbed } from 'discord.js';
-import { Command, CommandStore, Duration, KlasaClient, KlasaMessage } from 'klasa';
+import { Command, CommandStore, Duration, KlasaMessage } from 'klasa';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             guarded: true,
             description: (language) => language.get('COMMAND_STATS_DESCRIPTION'),
