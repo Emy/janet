@@ -5,7 +5,7 @@ import Dispatcher from '../../util/dispatcher';
 export default class extends Command {
     client: JanetClient;
     constructor(client: JanetClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+        super(store, file, dir, {
             enabled: true,
             runIn: ['text'],
             requiredPermissions: [],

@@ -6,7 +6,7 @@ import JanetClient from '../lib/client';
 export default class extends Event {
     client: JanetClient;
     constructor(client: JanetClient, store: EventStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+        super(store, file, dir, {
             enabled: true,
             once: false,
         });

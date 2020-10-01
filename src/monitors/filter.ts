@@ -1,13 +1,13 @@
 import { Collection, GuildMember, MessageEmbed, TextChannel } from 'discord.js';
 import ASCIIFolder from 'fold-to-ascii';
-import { Duration, KlasaClient, KlasaMessage, KlasaUser, Monitor, MonitorStore, RateLimit } from 'klasa';
+import { Duration, KlasaMessage, KlasaUser, Monitor, MonitorStore, RateLimit } from 'klasa';
 import Case from '../util/case';
 
 export default class extends Monitor {
     ratelimits: Collection<string, RateLimit>;
 
-    constructor(client: KlasaClient, store: MonitorStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: MonitorStore, file: string[], dir: string) {
+        super(store, file, dir, {
             enabled: true,
             ignoreBots: false,
             ignoreSelf: true,
