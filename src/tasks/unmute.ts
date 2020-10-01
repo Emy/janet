@@ -1,5 +1,5 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
-import { KlasaClient, Task, TaskStore } from 'klasa';
+import { Task, TaskStore } from 'klasa';
 import Case from '../util/case';
 
 type unmuteData = {
@@ -8,8 +8,8 @@ type unmuteData = {
 };
 
 export default class extends Task {
-    constructor(client: KlasaClient, store: TaskStore, file: string[], dir: string) {
-        super(client, store, file, dir, { enabled: true });
+    constructor(store: TaskStore, file: string[], dir: string) {
+        super(store, file, dir, { enabled: true });
     }
 
     async run(data: unmuteData) {

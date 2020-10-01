@@ -2,8 +2,8 @@ import { Command, CommandStore, KlasaClient, KlasaMessage, TextPrompt, Usage } f
 import { IDevice, getDevices, getDevice } from 'ipswme';
 
 export default class extends Command {
-    constructor(client: KlasaClient, store: CommandStore, file: string[], dir: string) {
-        super(client, store, file, dir, {
+    constructor(store: CommandStore, file: string[], dir: string) {
+        super(store, file, dir, {
             promptLimit: 2,
             promptTime: 30 * 1000,
             runIn: ['text'],

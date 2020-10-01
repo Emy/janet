@@ -1,4 +1,4 @@
-import { Client, KlasaClient, KlasaClientOptions } from 'klasa';
+import { KlasaClient, KlasaClientOptions } from 'klasa';
 import { Shoukaku } from 'shoukaku';
 import Queue from '../util/queue';
 
@@ -24,8 +24,8 @@ export default class JanetClient extends KlasaClient {
     queue: Queue;
     constructor(options: KlasaClientOptions) {
         super(options);
-        Client.defaultClientSchema.add('caseID', 'integer', { default: 0, min: 0, configurable: false });
-        Client.defaultGuildSchema
+        KlasaClient.defaultClientSchema.add('caseID', 'integer', { default: 0, min: 0, configurable: false });
+        KlasaClient.defaultGuildSchema
             .add('roles', (folder) => {
                 folder.add('muted', 'role');
                 folder.add('member', 'role');
@@ -51,7 +51,7 @@ export default class JanetClient extends KlasaClient {
             .add('logging', (folder) => {
                 folder.add('excludedChannels', 'textchannel', { array: true });
             });
-        Client.defaultUserSchema
+        KlasaClient.defaultUserSchema
             .add('isMuted', 'boolean', { default: false, configurable: false })
             .add('clem', 'boolean', { default: false, configurable: false })
             .add('xpFrozen', 'boolean', { default: false, configurable: false })
