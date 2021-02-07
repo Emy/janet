@@ -1,0 +1,175 @@
+const discord = require('discord.js');
+const client = new discord.Client({ partials: ['MESSAGE', 'REACTION']});
+const settings = require("./settings.json");
+
+// Getting the client ready
+client.on('ready', () => {
+    console.log(client.user.tag + " has logged in");
+});
+
+client.on('message', message => {
+  if (message.author.bot) return;
+
+  const args = message.content.slice(0).split(/ +/);
+
+  if (message.content.startsWith('jembed')) {
+      
+      message.channel.send({embed: {
+      color: 0x6666ff,
+      author: {
+        name: 'Request a Role'
+      },
+      title: "Jailbreak Updates",
+      "fields": [
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **Checkra1n** updates click <:checkra1n:631882898609537024>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **Chimera** updates click <:Chimera:572889560669880320>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **Unc0ver** updates click <:unc0ver:501020890662830080> "
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **tvOS Jailbreaks** updates click <:tvOSJailbreak:708187730814828545>"
+          }
+        ],
+    }
+  }).then(ch => ch.react('631882898609537024')
+      .then(ch.react('572889560669880320'))
+      .then(ch.react('501020890662830080'))
+      .then(ch.react('708187730814828545')))
+  } else
+
+  if (message.content.startsWith('sembed')) {
+      
+      message.channel.send({embed: {
+      color: 0xff6666,
+      author: {
+        name: 'Request a Role'
+      },
+      title: "Software Updates",
+      "fields": [
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **iOS** updates click <:iOS:708207045727223880> "
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **iPadOS** updates click <:ipadOS:708207045681348639>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **tvOS** updates click <:tvOS:708207045752520744>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **macOS** updates click <:macOS:708207045534548040>"
+          },
+          {
+             "name": "‎",
+             "value": "If you want to be notified about **watchOS** updates click <:watchOS:708207045702058012>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about any **Other Apple Updates** click <:otherupdates:708207838672977951>"
+          },
+
+        ],
+    }
+  }).then(ch => ch.react('708207045727223880')
+  .then(ch.react('708207045681348639'))
+  .then(ch.react('708207045752520744'))
+  .then(ch.react('708207045534548040'))
+  .then(ch.react('708207045702058012'))
+  .then(ch.react('708207838672977951')))
+
+
+} else
+
+  if (message.content.startsWith('oembed')) {
+      
+      message.channel.send({embed: {
+      color: 0x008000,
+      author: {
+        name: 'Request a Role'
+      },
+      title: "Other Updates",
+      "fields": [
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **Apple Events** click <:AppleEventNews:709588382845501498>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about **Subreddit News** click <:SubredditNews:709589516197036062>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about any **Community Events** click <:CommunityEvents:709590093173882900>"
+          },
+          {
+            "name": "‎",
+            "value": "If you want to be notified about any **Giveaways** click 🎉"
+          }   
+        ],
+    }
+  }).then(ch => ch.react('709588382845501498')
+  .then(ch.react('709589516197036062'))
+  .then(ch.react('709590093173882900'))
+  .then(ch.react('709585002685399090')))
+  }
+
+});
+
+client.on('messageReactionAdd', async (reaction, user) => {
+
+    let applyRole = async () => {
+        let emojiName = reaction.emoji.name;
+        let role = reaction.message.guild.roles.cache.find(role => role.name.toLowerCase() ===
+        emojiName.toLowerCase());
+        let member = reaction.message.guild.members.cache.find(member => member.id === user.id)
+        try {
+            if (role && member) {
+              console.log(`role is : ${role.id}`)
+              console.log('role and member found.')
+                let hasRole = member.roles.cache.has(role.id)
+                console.log(`${hasRole} wtffffffffffff`)
+                if (hasRole){
+                    await member.roles.remove(role)
+                    console.log('removed role')
+                  } else {
+                await member.roles.add(role)
+                console.log(`done lmao added the ${role} role`)
+                }
+            }
+        }
+        catch(err){
+            console.log(err)
+        }
+    }
+
+    if (reaction.message.partial) {
+        console.log("partial")
+        try {
+            let message = await reaction.message.fetch();
+            if (reaction.message.id === '709605272624037948' || reaction.message.id === '709605294937997365' || reaction.message.id === '709605303267885126'){
+            applyRole();
+            reaction.users.remove(user)
+            }
+        }
+        catch(err){
+            console.log(err)
+        }
+
+    } else {
+       if (reaction.message.id === '709605272624037948' || reaction.message.id === '709605294937997365' || reaction.message.id === '709605303267885126'){
+           applyRole();
+           reaction.users.remove(user)
+       }
+    }
+});
