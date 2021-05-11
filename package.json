@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "discord.js": "discordjs/discord.js",
-    "dotenv": "^8.2.0",
+    "dotenv": "^9.0.2",
     "fold-to-ascii": "^5.0.0",
     "ipswme": "^2.2.1",
     "klasa": "^0.5.0",
