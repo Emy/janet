@@ -24,7 +24,7 @@
     "shoukaku": "Deivu/Shoukaku"
   },
   "devDependencies": {
-    "@types/node": "^14.0.4",
+    "@types/node": "^15.9.0",
     "@types/node-fetch": "^2.5.5",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
